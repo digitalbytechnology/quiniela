@@ -81,7 +81,7 @@
     <!-- Footer -->
     <footer>
         <div class="container">
-            <p>&copy; {{ date('Y') }} Quiniela Mundial 2026. Todos los derechos reservados. Desarrollado con ⚽ para fanáticos del fútbol.</p>
+            <p>&copy; {{ date('Y') }} Quiniela Mundial 2026. Todos los derechos reservados. Desarrollado por Hugo Díaz.</p>
         </div>
     </footer>
 
