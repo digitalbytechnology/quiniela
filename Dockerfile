@@ -53,8 +53,11 @@ RUN composer install --no-interaction --optimize-autoloader --no-dev --no-script
 # Run composer post-autoload-dump to make sure package discovery runs
 RUN composer dump-autoload --optimize --no-dev
 
-# Set permissions for Laravel storage and bootstrap/cache
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+# Create uploads directory for profile pictures
+RUN mkdir -p /var/www/html/public/uploads/profiles
+
+# Set permissions for Laravel storage, bootstrap/cache and uploads
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public/uploads
 
 # Use the default production configuration
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
