@@ -59,8 +59,11 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 # Use the default production configuration
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
-# Run migrations and start Apache
-CMD php artisan migrate --force && apache2-foreground
+# Copy and set up entrypoint script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 # Expose port 80
 EXPOSE 80
+
+CMD ["/entrypoint.sh"]
