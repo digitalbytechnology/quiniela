@@ -63,27 +63,17 @@ class QuinielaController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'name'            => 'required|string|max:255',
-            'email'           => 'required|string|email|max:255|unique:users',
-            'password'        => 'required|string|min:6|confirmed',
-            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:6|confirmed',
         ]);
 
-        $profilePath = null;
-        if ($request->hasFile('profile_picture')) {
-            $file = $request->file('profile_picture');
-            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/profiles'), $filename);
-            $profilePath = 'uploads/profiles/' . $filename;
-        }
-
         $user = User::create([
-            'name'            => $request->name,
-            'email'           => $request->email,
-            'profile_picture' => $profilePath,
-            'password'        => Hash::make($request->password),
-            'role'            => 'user',
-            'points'          => 0,
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'password' => Hash::make($request->password),
+            'role'     => 'user',
+            'points'   => 0,
         ]);
 
         Auth::login($user);

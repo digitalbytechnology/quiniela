@@ -10,7 +10,7 @@
             <p style="color: var(--text-muted); font-size: 0.95rem;">Regístrate para comenzar a pronosticar los marcadores</p>
         </div>
 
-        <form action="{{ route('register') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('register') }}" method="POST">
             @csrf
 
             <div class="form-group">
@@ -29,13 +29,7 @@
                 @enderror
             </div>
 
-            <div class="form-group">
-                <label for="profile_picture" class="form-label">Foto de Perfil</label>
-                <input type="file" name="profile_picture" id="profile_picture" class="form-control" accept="image/*" required style="padding: 0.6rem 1rem;">
-                @error('profile_picture')
-                    <span style="color: var(--danger); font-size: 0.85rem; margin-top: 0.25rem; display: block;">{{ $message }}</span>
-                @enderror
-            </div>
+
 
             <div class="form-group">
                 <label for="password" class="form-label">Contraseña</label>
