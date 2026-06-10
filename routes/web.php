@@ -31,4 +31,14 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/admin/games/bulk-update', [QuinielaController::class, 'bulkUpdateGames'])->name('admin.games.bulk_update');
     Route::get('/admin/print-results',     [QuinielaController::class, 'printResults'])->name('admin.print_results');
     Route::post('/admin/declare-champion', [QuinielaController::class, 'declareChampion'])->name('admin.champion.declare');
+
+    // RUTA TEMPORAL PARA ARREGLAR DUPLICADOS EN PRODUCCIÓN
+    Route::get('/admin/fix-duplicados', function () {
+        if (!auth()->user()->isAdmin()) {
+            return 'Acceso denegado.';
+        }
+        \App\Models\Game::truncate();
+        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'WorldCupSeeder']);
+        return '¡Partidos limpiados y re-creados exitosamente! Ya puedes regresar al dashboard.';
+    });
 });
