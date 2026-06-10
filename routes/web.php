@@ -39,11 +39,17 @@ Route::middleware(['auth'])->group(function () {
         }
         
         try {
-            // Delete all games. delete() activates ON DELETE CASCADE for predictions
-            // unlike truncate() which fails on MySQL if there are foreign keys.
+            // Limpiar OPcache y caché de Laravel para forzar a leer el código nuevo
+            if (function_exists('opcache_reset')) {
+                opcache_reset();
+            }
+            \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+
+            // Borrar todos los partidos y resembrar
             \App\Models\Game::query()->delete();
             \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'WorldCupSeeder']);
-            return '¡Partidos limpiados y re-creados exitosamente! Ya puedes regresar al dashboard.';
+            
+            return '¡Caché limpiada y partidos re-creados exitosamente! Por favor recarga el dashboard y verifica.';
         } catch (\Exception $e) {
             return 'Error al limpiar base de datos: ' . $e->getMessage();
         }
