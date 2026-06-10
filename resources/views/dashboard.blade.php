@@ -36,6 +36,8 @@
 <!-- Tabs Navigation -->
 <div class="tabs-header">
     <button class="tab-btn active" onclick="switchTab(event, 'tab-partidos')">⚽ Mis Pronósticos</button>
+    <button class="tab-btn" onclick="switchTab(event, 'tab-historial')">📋 Mi Historial</button>
+    <button class="tab-btn" onclick="switchTab(event, 'tab-grupos')">📈 Tabla de Grupos</button>
     <button class="tab-btn" onclick="switchTab(event, 'tab-campeon')">🏆 Campeón del Mundial</button>
     <button class="tab-btn" onclick="switchTab(event, 'tab-reglas')">📜 Reglas de Puntos</button>
 </div>
@@ -43,7 +45,10 @@
 <div class="dashboard-grid" style="display: flex; gap: 2rem; align-items: flex-start; margin-top: 2rem; flex-wrap: wrap;">
     <!-- Main Content Column -->
     <div style="flex: 2.5; min-width: 300px; width: 100%;">
-        <!-- Tab: Partidos -->
+
+        <!-- ═══════════════════════════════════════════════
+             TAB: MIS PRONÓSTICOS
+        ════════════════════════════════════════════════ -->
         <div id="tab-partidos" class="tab-content active">
             @if($groupedGames->isEmpty())
                 <div class="glass-card" style="text-align: center; padding: 4rem 2rem;">
@@ -57,8 +62,44 @@
                     
                     @php $inputIndex = 0; @endphp
                     @foreach($groupedGames as $stageName => $gamesList)
+                        @php
+                            $firstGame = $gamesList->first();
+                            $stageKey  = $firstGame ? $firstGame->stage : 'group';
+                            $isStageOpen = in_array($stageKey, $unlockedStages);
+                            // Determine the stage that must be completed before this one
+                            $prevStageMap = [
+                                'r32'         => 'Fase de Grupos',
+                                'r16'         => 'Dieciseisavos de Final',
+                                'quarter'     => 'Octavos de Final',
+                                'semi'        => 'Cuartos de Final',
+                                'third_place' => 'Semifinales',
+                                'final'       => 'Semifinales',
+                            ];
+                            $prevStage = $prevStageMap[$stageKey] ?? null;
+                        @endphp
                         <div class="stage-section">
-                            <h3 class="stage-title">{{ $stageName }}</h3>
+                            {{-- Stage Header with unlock indicator (#9) --}}
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                                <h3 class="stage-title" style="margin-bottom: 0;">{{ $stageName }}</h3>
+                                @if($stageKey === 'group' || $isStageOpen)
+                                    <span style="background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); padding: 0.2rem 0.65rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em;">
+                                        🔓 ABIERTA
+                                    </span>
+                                @else
+                                    <span style="background: rgba(255,255,255,0.04); color: var(--text-muted); border: 1px solid var(--border-glass); padding: 0.2rem 0.65rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em;">
+                                        🔒 BLOQUEADA
+                                    </span>
+                                @endif
+                            </div>
+
+                            {{-- Blocked stage explanation (#9) --}}
+                            @if(!$isStageOpen && $stageKey !== 'group' && $prevStage)
+                                <div style="margin-bottom: 1.25rem; padding: 0.85rem 1.25rem; background: rgba(255,255,255,0.03); border: 1px dashed var(--border-glass); border-radius: 12px; display: flex; align-items: center; gap: 0.75rem; color: var(--text-muted); font-size: 0.9rem;">
+                                    <span style="font-size: 1.25rem;">⏳</span>
+                                    <span>Esta fase se desbloqueará cuando se completen todos los partidos de <strong style="color: white;">{{ $prevStage }}</strong>.</span>
+                                </div>
+                            @endif
+
                             <div class="games-grid">
                                 @foreach($gamesList as $game)
                                     @php
@@ -72,6 +113,10 @@
                                         $awayTeam = $game->awayTeam->getRealTeam();
                                         $isHomePlaceholder = ($homeTeam->group === 'TBD');
                                         $isAwayPlaceholder = ($awayTeam->group === 'TBD');
+
+                                        // Countdown urgency: < 3h → warning color
+                                        $minutesLeft = now()->diffInMinutes($game->match_date, false);
+                                        $isUrgent = !$hasStarted && $minutesLeft <= 180 && $minutesLeft > 0;
                                     @endphp
                                     
                                     <div class="game-card" @if(!$isStageUnlocked) style="opacity: 0.65; filter: grayscale(30%);" @endif>
@@ -82,10 +127,16 @@
                                         
                                         <div class="game-header">
                                             <div class="game-date" style="display: flex; flex-direction: column; align-items: flex-start; gap: 0.15rem;">
-                                                <span>📅 Partido: {{ $game->match_date->format('d/m/Y H:i') }}</span>
-                                                <span style="font-size: 0.75rem; color: var(--secondary); font-weight: 700;">
-                                                    ⏰ Límite: {{ $game->match_date->format('d/m/Y H:i') }}
-                                                </span>
+                                                <span>📅 {{ $game->match_date->format('d/m/Y H:i') }}</span>
+                                                @if($isUrgent)
+                                                    <span style="font-size: 0.75rem; color: #f59e0b; font-weight: 700; animation: pulse 1.5s infinite;">
+                                                        ⚡ ¡Cierra en {{ $minutesLeft }} min!
+                                                    </span>
+                                                @elseif(!$hasStarted && !$isFinished)
+                                                    <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">
+                                                        ⏰ Límite: {{ $game->match_date->format('H:i') }}
+                                                    </span>
+                                                @endif
                                             </div>
                                             <div>
                                                 @if($isFinished)
@@ -117,35 +168,13 @@
                                             <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
                                                 <div class="prediction-inputs">
                                                     @if(!$canPredict)
-                                                        <!-- Game not open for prediction -->
-                                                        <input type="number" 
-                                                               value="{{ $prediction ? $prediction->home_score : '' }}" 
-                                                               class="score-input" 
-                                                               disabled 
-                                                               placeholder="-">
+                                                        <input type="number" value="{{ $prediction ? $prediction->home_score : '' }}" class="score-input" disabled placeholder="-">
                                                         <span class="vs-divider">VS</span>
-                                                        <input type="number" 
-                                                               value="{{ $prediction ? $prediction->away_score : '' }}" 
-                                                               class="score-input" 
-                                                               disabled 
-                                                               placeholder="-">
+                                                        <input type="number" value="{{ $prediction ? $prediction->away_score : '' }}" class="score-input" disabled placeholder="-">
                                                     @else
-                                                        <!-- Game open for prediction -->
-                                                        <input type="number" 
-                                                               name="predictions[{{ $inputIndex }}][home_score]" 
-                                                               value="{{ $prediction ? $prediction->home_score : '' }}" 
-                                                               class="score-input" 
-                                                               min="0" 
-                                                               required
-                                                               placeholder="-">
+                                                        <input type="number" name="predictions[{{ $inputIndex }}][home_score]" value="{{ $prediction ? $prediction->home_score : '' }}" class="score-input" min="0" required placeholder="-">
                                                         <span class="vs-divider">VS</span>
-                                                        <input type="number" 
-                                                               name="predictions[{{ $inputIndex }}][away_score]" 
-                                                               value="{{ $prediction ? $prediction->away_score : '' }}" 
-                                                               class="score-input" 
-                                                               min="0" 
-                                                               required
-                                                               placeholder="-">
+                                                        <input type="number" name="predictions[{{ $inputIndex }}][away_score]" value="{{ $prediction ? $prediction->away_score : '' }}" class="score-input" min="0" required placeholder="-">
                                                     @endif
                                                 </div>
 
@@ -172,42 +201,26 @@
                                         <!-- Feedback on points earned -->
                                         @if($isFinished && $prediction)
                                             @if($prediction->points_earned == 3)
-                                                <div class="match-points-feedback points-earned-exact">
-                                                    ⭐ +3 Puntos (Marcador Exacto)
-                                                </div>
+                                                <div class="match-points-feedback points-earned-exact">⭐ +3 Puntos (Marcador Exacto)</div>
                                             @elseif($prediction->points_earned == 1)
-                                                <div class="match-points-feedback points-earned-outcome">
-                                                    ✔️ +1 Punto (Ganador/Empate Acertado)
-                                                </div>
+                                                <div class="match-points-feedback points-earned-outcome">✔️ +1 Punto (Ganador/Empate Acertado)</div>
                                             @else
-                                                <div class="match-points-feedback points-earned-none">
-                                                    ❌ 0 Puntos (Resultado Incorrecto)
-                                                </div>
+                                                <div class="match-points-feedback points-earned-none">❌ 0 Puntos (Resultado Incorrecto)</div>
                                             @endif
                                         @elseif($isFinished && !$prediction)
-                                            <div class="match-points-feedback points-earned-none">
-                                                🚫 0 Puntos (No registraste pronóstico)
-                                            </div>
+                                            <div class="match-points-feedback points-earned-none">🚫 0 Puntos (No registraste pronóstico)</div>
                                         @elseif(!$isStageUnlocked)
                                             <div class="match-points-feedback" style="color: var(--text-muted); background: rgba(255, 255, 255, 0.02); border: 1px dashed var(--border-glass);">
-                                                🔒 Fase Bloqueada (Completa la fase anterior)
+                                                🔒 Fase Bloqueada — Completa la fase anterior
                                             </div>
                                         @elseif($hasStarted && $prediction)
-                                            <div class="match-points-feedback" style="color: var(--warning); background: rgba(245, 158, 11, 0.05);">
-                                                🔒 Pronóstico Cerrado
-                                            </div>
+                                            <div class="match-points-feedback" style="color: var(--warning); background: rgba(245, 158, 11, 0.05);">🔒 Pronóstico Cerrado</div>
                                         @elseif($hasStarted && !$prediction)
-                                            <div class="match-points-feedback" style="color: var(--danger); background: rgba(239, 68, 68, 0.05);">
-                                                🔒 Cerrado (Sin Pronóstico)
-                                            </div>
+                                            <div class="match-points-feedback" style="color: var(--danger); background: rgba(239, 68, 68, 0.05);">🔒 Cerrado (Sin Pronóstico)</div>
                                         @elseif(!$hasStarted && $prediction)
-                                            <div class="match-points-feedback" style="color: var(--accent); background: rgba(16, 185, 129, 0.05);">
-                                                ✍️ Modificar Pronóstico
-                                            </div>
+                                            <div class="match-points-feedback" style="color: var(--accent); background: rgba(16, 185, 129, 0.05);">✍️ Modificar Pronóstico</div>
                                         @elseif(!$hasStarted && !$prediction)
-                                            <div class="match-points-feedback" style="color: var(--primary); background: rgba(99, 102, 241, 0.05);">
-                                                📝 Pendiente de Pronóstico
-                                            </div>
+                                            <div class="match-points-feedback" style="color: var(--primary); background: rgba(99, 102, 241, 0.05);">📝 Pendiente de Pronóstico</div>
                                         @endif
                                     </div>
                                     
@@ -231,7 +244,179 @@
             @endif
         </div>
 
-        <!-- Tab: Campeón del Mundial -->
+        <!-- ═══════════════════════════════════════════════
+             TAB: MI HISTORIAL (#2)
+        ════════════════════════════════════════════════ -->
+        <div id="tab-historial" class="tab-content">
+            {{-- Stats summary --}}
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                <div class="glass-card" style="padding: 1rem; text-align: center; border-radius: 14px;">
+                    <div style="font-size: 1.6rem; font-weight: 800; color: white;">{{ $historyStats['total'] }}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-top: 0.25rem;">Partidos Jugados</div>
+                </div>
+                <div class="glass-card" style="padding: 1rem; text-align: center; border-radius: 14px; border-color: rgba(250,204,21,0.3);">
+                    <div style="font-size: 1.6rem; font-weight: 800; color: #facc15;">{{ $historyStats['exact'] }}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-top: 0.25rem;">⭐ Exactos (+3)</div>
+                </div>
+                <div class="glass-card" style="padding: 1rem; text-align: center; border-radius: 14px; border-color: rgba(16,185,129,0.3);">
+                    <div style="font-size: 1.6rem; font-weight: 800; color: #10b981;">{{ $historyStats['correct'] }}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-top: 0.25rem;">✔️ Correctos (+1)</div>
+                </div>
+                <div class="glass-card" style="padding: 1rem; text-align: center; border-radius: 14px; border-color: rgba(239,68,68,0.2);">
+                    <div style="font-size: 1.6rem; font-weight: 800; color: var(--danger);">{{ $historyStats['wrong'] + $historyStats['missed'] }}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-top: 0.25rem;">❌ Sin Puntos</div>
+                </div>
+            </div>
+
+            {{-- Export button (#10) --}}
+            @if($historyStats['total'] > 0)
+                <div style="display: flex; justify-content: flex-end; margin-bottom: 1.25rem;">
+                    <a href="{{ route('export.predictions') }}" class="btn btn-primary" style="font-size: 0.9rem; padding: 0.6rem 1.5rem; border-radius: 10px; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 15px rgba(16,185,129,0.3);">
+                        ⬇️ Exportar mis resultados (CSV)
+                    </a>
+                </div>
+            @endif
+
+            @if($predictionHistory->isEmpty())
+                <div class="glass-card" style="text-align: center; padding: 3rem 2rem;">
+                    <span style="font-size: 3rem;">⏳</span>
+                    <h3 style="margin-top: 1rem; color: var(--text-muted);">Aún no hay partidos finalizados</h3>
+                    <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.9rem;">Tu historial de pronósticos aparecerá aquí cuando terminen los partidos.</p>
+                </div>
+            @else
+                <div class="glass-card" style="padding: 0; overflow: hidden;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+                        <thead>
+                            <tr style="background: rgba(255,255,255,0.04); border-bottom: 1px solid var(--border-glass);">
+                                <th style="padding: 0.9rem 1.25rem; text-align: left; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em;">Partido</th>
+                                <th style="padding: 0.9rem 1rem; text-align: center; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em;">Fecha</th>
+                                <th style="padding: 0.9rem 1rem; text-align: center; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em;">Mi Pronóstico</th>
+                                <th style="padding: 0.9rem 1rem; text-align: center; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em;">Resultado</th>
+                                <th style="padding: 0.9rem 1.25rem; text-align: center; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em;">Puntos</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($predictionHistory as $row)
+                                @php
+                                    $g    = $row['game'];
+                                    $pred = $row['prediction'];
+                                    $pts  = $pred ? ($pred->points_earned ?? 0) : 0;
+                                    $rowBg = $pred && $pts == 3 ? 'rgba(250,204,21,0.05)' : ($pred && $pts == 1 ? 'rgba(16,185,129,0.04)' : 'transparent');
+                                @endphp
+                                <tr style="border-bottom: 1px solid var(--border-glass); background: {{ $rowBg }}; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background='{{ $rowBg }}'">
+                                    <td style="padding: 0.85rem 1.25rem; font-weight: 600;">
+                                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                                            <img src="https://flagcdn.com/w40/{{ $g->homeTeam->code }}.png" style="height: 18px; border-radius: 2px;" onerror="this.style.display='none'">
+                                            <span style="font-size: 0.8rem;">{{ $g->homeTeam->name }}</span>
+                                            <span style="color: var(--text-muted); font-size: 0.75rem;">vs</span>
+                                            <span style="font-size: 0.8rem;">{{ $g->awayTeam->name }}</span>
+                                            <img src="https://flagcdn.com/w40/{{ $g->awayTeam->code }}.png" style="height: 18px; border-radius: 2px;" onerror="this.style.display='none'">
+                                        </div>
+                                    </td>
+                                    <td style="padding: 0.85rem 1rem; text-align: center; color: var(--text-muted); font-size: 0.8rem; white-space: nowrap;">
+                                        {{ $g->match_date->format('d/m/Y') }}<br>{{ $g->match_date->format('H:i') }}
+                                    </td>
+                                    <td style="padding: 0.85rem 1rem; text-align: center;">
+                                        @if($pred)
+                                            <span style="font-weight: 700; font-size: 0.95rem; color: white;">{{ $pred->home_score }} – {{ $pred->away_score }}</span>
+                                        @else
+                                            <span style="color: var(--text-muted); font-size: 0.8rem;">Sin pronóstico</span>
+                                        @endif
+                                    </td>
+                                    <td style="padding: 0.85rem 1rem; text-align: center;">
+                                        <span style="font-weight: 800; font-size: 1rem;">{{ $g->home_score }} – {{ $g->away_score }}</span>
+                                    </td>
+                                    <td style="padding: 0.85rem 1.25rem; text-align: center;">
+                                        @if(!$pred)
+                                            <span style="color: var(--text-muted); font-size: 0.85rem;">—</span>
+                                        @elseif($pts == 3)
+                                            <span style="background: rgba(250,204,21,0.15); color: #facc15; padding: 0.3rem 0.75rem; border-radius: 20px; font-weight: 800; font-size: 0.9rem;">⭐ +3</span>
+                                        @elseif($pts == 1)
+                                            <span style="background: rgba(16,185,129,0.15); color: #10b981; padding: 0.3rem 0.75rem; border-radius: 20px; font-weight: 800; font-size: 0.9rem;">✔️ +1</span>
+                                        @else
+                                            <span style="background: rgba(239,68,68,0.1); color: var(--danger); padding: 0.3rem 0.75rem; border-radius: 20px; font-weight: 800; font-size: 0.9rem;">❌ 0</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+        </div>
+
+        <!-- ═══════════════════════════════════════════════
+             TAB: TABLA DE GRUPOS (#7)
+        ════════════════════════════════════════════════ -->
+        <div id="tab-grupos" class="tab-content">
+            @if(empty($groupStandings))
+                <div class="glass-card" style="text-align: center; padding: 3rem 2rem;">
+                    <span style="font-size: 3rem;">📊</span>
+                    <h3 style="margin-top: 1rem; color: var(--text-muted);">La tabla se actualizará cuando terminen partidos</h3>
+                    <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.9rem;">Los resultados de los partidos de grupo irán llenando las posiciones.</p>
+                </div>
+            @else
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.5rem;">
+                    @foreach($groupStandings as $groupLetter => $teams)
+                        <div class="glass-card" style="padding: 0; overflow: hidden;">
+                            <div style="padding: 0.85rem 1.25rem; background: rgba(99,102,241,0.1); border-bottom: 1px solid var(--border-glass); display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="font-size: 1.1rem; font-weight: 800; color: var(--primary);">Grupo {{ $groupLetter }}</span>
+                            </div>
+                            <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem;">
+                                <thead>
+                                    <tr style="border-bottom: 1px solid var(--border-glass);">
+                                        <th style="padding: 0.5rem 0.75rem; text-align: left; color: var(--text-muted); font-weight: 600; font-size: 0.7rem; text-transform: uppercase;">Equipo</th>
+                                        <th style="padding: 0.5rem 0.4rem; text-align: center; color: var(--text-muted); font-weight: 600; font-size: 0.7rem;" title="Partidos Jugados">PJ</th>
+                                        <th style="padding: 0.5rem 0.4rem; text-align: center; color: var(--text-muted); font-weight: 600; font-size: 0.7rem;" title="Ganados">G</th>
+                                        <th style="padding: 0.5rem 0.4rem; text-align: center; color: var(--text-muted); font-weight: 600; font-size: 0.7rem;" title="Empatados">E</th>
+                                        <th style="padding: 0.5rem 0.4rem; text-align: center; color: var(--text-muted); font-weight: 600; font-size: 0.7rem;" title="Perdidos">P</th>
+                                        <th style="padding: 0.5rem 0.4rem; text-align: center; color: var(--text-muted); font-weight: 600; font-size: 0.7rem;" title="Diferencia de Goles">DG</th>
+                                        <th style="padding: 0.5rem 0.75rem; text-align: center; color: var(--primary); font-weight: 700; font-size: 0.7rem;">Pts</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($teams as $idx => $entry)
+                                        @php
+                                            $isTop2 = $idx < 2;
+                                            $gd = $entry['gf'] - $entry['gc'];
+                                            $rowStyle = $isTop2 ? 'background: rgba(99,102,241,0.05);' : '';
+                                        @endphp
+                                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); {{ $rowStyle }}">
+                                            <td style="padding: 0.6rem 0.75rem;">
+                                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                                    <span style="width: 18px; text-align: center; font-size: 0.75rem; color: {{ $isTop2 ? 'var(--primary)' : 'var(--text-muted)' }}; font-weight: 700;">{{ $idx + 1 }}</span>
+                                                    @if($entry['team']->code && $entry['team']->group !== 'TBD')
+                                                        <img src="https://flagcdn.com/w40/{{ $entry['team']->code }}.png" style="height: 16px; border-radius: 2px;" onerror="this.style.display='none'">
+                                                    @endif
+                                                    <span style="font-weight: {{ $isTop2 ? '700' : '500' }}; color: {{ $isTop2 ? 'white' : 'var(--text-muted)' }}; font-size: 0.82rem;">{{ $entry['team']->name }}</span>
+                                                    @if($isTop2)
+                                                        <span style="font-size: 0.6rem; background: rgba(99,102,241,0.2); color: var(--primary); padding: 0.1rem 0.3rem; border-radius: 4px; font-weight: 700;">Q</span>
+                                                    @endif
+                                                </div>
+                                            </td>
+                                            <td style="padding: 0.6rem 0.4rem; text-align: center; color: var(--text-muted);">{{ $entry['pj'] }}</td>
+                                            <td style="padding: 0.6rem 0.4rem; text-align: center; color: #10b981;">{{ $entry['g'] }}</td>
+                                            <td style="padding: 0.6rem 0.4rem; text-align: center; color: var(--text-muted);">{{ $entry['e'] }}</td>
+                                            <td style="padding: 0.6rem 0.4rem; text-align: center; color: var(--danger);">{{ $entry['p'] }}</td>
+                                            <td style="padding: 0.6rem 0.4rem; text-align: center; color: {{ $gd > 0 ? '#10b981' : ($gd < 0 ? 'var(--danger)' : 'var(--text-muted)') }};">{{ $gd > 0 ? '+' : '' }}{{ $gd }}</td>
+                                            <td style="padding: 0.6rem 0.75rem; text-align: center; font-weight: 800; font-size: 0.95rem; color: {{ $isTop2 ? 'var(--primary)' : 'white' }};">{{ $entry['pts'] }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endforeach
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 1.25rem; text-align: center;">
+                    <span style="background: rgba(99,102,241,0.15); color: var(--primary); padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.7rem; font-weight: 700;">Q</span>
+                    Clasificado a Dieciseisavos de Final · Ordenado por: Puntos → Diferencia de Goles → Goles a Favor
+                </p>
+            @endif
+        </div>
+
+        <!-- ═══════════════════════════════════════════════
+             TAB: CAMPEÓN DEL MUNDIAL
+        ════════════════════════════════════════════════ -->
         <div id="tab-campeon" class="tab-content">
             <div class="glass-card" style="max-width: 680px; margin: 0 auto;">
                 <div style="text-align: center; margin-bottom: 2rem;">
@@ -240,13 +425,13 @@
                         ¿Quién ganará el Mundial 2026?
                     </h2>
                     <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.95rem;">
-                        Selecciona al campeón antes del inicio del torneo (11 jun · 17:00).
+                        Selecciona al campeón antes del inicio del torneo
+                        <strong style="color: white;">({{ $championDeadline->format('d M · H:i') }})</strong>.
                         <br>Si aciertas, <strong style="color: #facc15;">ganas 50 puntos</strong>.
                     </p>
                 </div>
 
                 @if($worldChampion)
-                    {{-- Champion already declared --}}
                     <div style="text-align: center; padding: 1.5rem; background: rgba(250,204,21,0.08); border: 1px solid rgba(250,204,21,0.3); border-radius: 16px; margin-bottom: 2rem;">
                         <p style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">Campeón Oficial Declarado</p>
                         <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: 0.75rem;">
@@ -309,18 +494,19 @@
             </div>
         </div>
 
-        <!-- Tab: Reglas -->
+        <!-- ═══════════════════════════════════════════════
+             TAB: REGLAS DE PUNTOS
+        ════════════════════════════════════════════════ -->
         <div id="tab-reglas" class="tab-content">
             <div class="glass-card">
                 <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem;">Criterios de Puntuación</h3>
 
                 <div class="rules-list">
-
                     <div class="rules-item">
                         <div class="rule-number" style="background: linear-gradient(135deg, #facc15, #f59e0b); box-shadow: 0 4px 10px rgba(250,204,21,0.35); font-size: 1rem;">+50</div>
                         <div class="rule-content">
                             <h4>🏆 Campeón del Mundial (50 Puntos)</h4>
-                            <p>Acertar el equipo que se coronará Campeón del Mundo FIFA 2026. La selección se registra <strong>antes del inicio del torneo</strong> (11 jun · 17:00 h). Solo se puede elegir un equipo por participante. Si aciertas, recibes automáticamente <strong>+50 puntos</strong>.</p>
+                            <p>Acertar el equipo que se coronará Campeón del Mundo FIFA 2026. La selección se registra <strong>antes del inicio del torneo</strong> ({{ $championDeadline->format('d M · H:i') }} h). Solo se puede elegir un equipo por participante. Si aciertas, recibes automáticamente <strong>+50 puntos</strong>.</p>
                         </div>
                     </div>
 
@@ -352,7 +538,7 @@
                 <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-glass);">
                     <h4 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem;">⚠️ Reglas Adicionales de la Quiniela:</h4>
                     <ul style="color: var(--text-muted); padding-left: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.95rem;">
-                        <li>La selección del Campeón del Mundial debe registrarse <strong>antes del inicio del torneo</strong> (11 jun · 17:00 h). No se podrá modificar después.</li>
+                        <li>La selección del Campeón del Mundial debe registrarse <strong>antes del inicio del torneo</strong> ({{ $championDeadline->format('d M · H:i') }} h). No se podrá modificar después.</li>
                         <li>Los pronósticos de partidos se cierran individualmente al momento de iniciar el encuentro, de acuerdo a la hora oficial programada en el sistema.</li>
                         <li>Si un pronóstico queda incompleto (vacío), no se computarán puntos para ese partido.</li>
                         <li>En fases eliminatorias directas (R32 en adelante), el resultado que se toma en cuenta es el del tiempo reglamentario completo (90 min + descuento). No incluye prórroga ni penales.</li>
@@ -362,7 +548,7 @@
         </div>
     </div>
 
-    <!-- Sidebar: Clasificación General (Always Visible) -->
+    <!-- Sidebar: Clasificación General -->
     <div style="flex: 1.2; min-width: 320px; width: 100%;">
         <div class="glass-card" style="padding: 1.5rem 0; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
             <h3 style="font-size: 1.4rem; font-weight: 700; margin-bottom: 1.25rem; padding: 0 1.25rem; background: linear-gradient(135deg, white, var(--text-muted)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
@@ -385,14 +571,10 @@
                             @endphp
                             <tr class="leaderboard-row {{ $isMe ? 'current-user' : '' }}">
                                 <td class="rank-col" style="padding: 0.85rem 1rem; font-size: 0.95rem;">
-                                    @if($position == 1)
-                                        🥇
-                                    @elseif($position == 2)
-                                        🥈
-                                    @elseif($position == 3)
-                                        🥉
-                                    @else
-                                        {{ $position }}
+                                    @if($position == 1) 🥇
+                                    @elseif($position == 2) 🥈
+                                    @elseif($position == 3) 🥉
+                                    @else {{ $position }}
                                     @endif
                                 </td>
                                 <td style="padding: 0.85rem 1rem; font-size: 0.9rem; display: flex; align-items: center; gap: 0.75rem; border-bottom: none;">
@@ -404,9 +586,7 @@
                                         </div>
                                     @endif
                                     <div style="display: flex; align-items: center; gap: 0.25rem;">
-                                        <span style="font-weight: 600; {{ $isMe ? 'color: var(--primary);' : '' }}">
-                                            {{ $lUser->name }}
-                                        </span>
+                                        <span style="font-weight: 600; {{ $isMe ? 'color: var(--primary);' : '' }}">{{ $lUser->name }}</span>
                                         @if($isMe)
                                             <span style="font-size: 0.65rem; background: rgba(99, 102, 241, 0.2); padding: 0.1rem 0.35rem; border-radius: 8px;">Tú</span>
                                         @endif
@@ -428,34 +608,18 @@
 @section('scripts')
 <script>
     function switchTab(evt, tabId) {
-        // Hide all tab contents
-        const tabContents = document.querySelectorAll('.tab-content');
-        tabContents.forEach(content => {
-            content.classList.remove('active');
-        });
-
-        // Deactivate all tab buttons
-        const tabBtns = document.querySelectorAll('.tab-btn');
-        tabBtns.forEach(btn => {
-            btn.classList.remove('active');
-        });
-
-        // Show current tab content & activate button
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(tabId).classList.add('active');
         evt.currentTarget.classList.add('active');
-        
-        // Save current tab in localStorage
         localStorage.setItem('activeQuinielaTab', tabId);
     }
 
-    // Auto load last active tab
     document.addEventListener('DOMContentLoaded', () => {
         const lastActiveTab = localStorage.getItem('activeQuinielaTab');
-        if (lastActiveTab) {
+        if (lastActiveTab && document.getElementById(lastActiveTab)) {
             const btn = document.querySelector(`button[onclick*="${lastActiveTab}"]`);
-            if (btn) {
-                btn.click();
-            }
+            if (btn) btn.click();
         }
     });
 </script>

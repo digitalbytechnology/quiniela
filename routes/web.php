@@ -22,6 +22,9 @@ Route::middleware(['auth'])->group(function () {
     // Champion pick
     Route::post('/champion-pick', [QuinielaController::class, 'saveChampionPick'])->name('champion.pick');
 
+    // Export CSV (#10)
+    Route::get('/export/predictions', [QuinielaController::class, 'exportPredictions'])->name('export.predictions');
+
     // Admin routes
     Route::get('/admin',                   [QuinielaController::class, 'adminDashboard'])->name('admin.dashboard');
     Route::post('/admin/game/{id}',        [QuinielaController::class, 'updateGameResult'])->name('admin.game.update');

@@ -128,12 +128,33 @@ class QuinielaController extends Controller
         $worldChampion   = $worldChampionId ? Team::find($worldChampionId) : null;
         $userChampionPick = $user->championPick;
 
-        // Deadline: tournament start (first game)
-        $championDeadline   = Carbon::parse('2026-06-11 17:00:00');
+        // --- DEADLINE DINÁMICA (#1 y #8): Lee el primer partido real de la BD ---
+        $firstGame = Game::where('stage', 'group')->orderBy('match_date', 'asc')->first();
+        $championDeadline   = $firstGame ? $firstGame->match_date : Carbon::parse('2026-06-11 13:00:00');
         $championPickClosed = Carbon::now()->isAfter($championDeadline);
 
         // Unlocked stages based on finished games
         $unlockedStages = Game::getUnlockedStages();
+
+        // --- HISTORIAL DE PREDICCIONES (#2): Partidos finalizados con predicciones ---
+        $finishedGames = $games->where('status', 'finished')->values();
+        $predictionHistory = $finishedGames->map(function ($game) use ($predictions) {
+            return [
+                'game'       => $game,
+                'prediction' => $predictions->get($game->id),
+            ];
+        });
+        $historyStats = [
+            'total'     => $predictionHistory->count(),
+            'predicted' => $predictionHistory->filter(fn($r) => $r['prediction'])->count(),
+            'exact'     => $predictionHistory->filter(fn($r) => $r['prediction'] && $r['prediction']->points_earned == 3)->count(),
+            'correct'   => $predictionHistory->filter(fn($r) => $r['prediction'] && $r['prediction']->points_earned == 1)->count(),
+            'wrong'     => $predictionHistory->filter(fn($r) => $r['prediction'] && $r['prediction']->points_earned == 0)->count(),
+            'missed'    => $predictionHistory->filter(fn($r) => !$r['prediction'])->count(),
+        ];
+
+        // --- TABLA DE POSICIONES POR GRUPO (#7) ---
+        $groupStandings = $this->calculateGroupStandings($games);
 
         return view('dashboard', compact(
             'groupedGames',
@@ -143,8 +164,12 @@ class QuinielaController extends Controller
             'worldChampion',
             'userChampionPick',
             'championPickClosed',
+            'championDeadline',
             'worldChampionId',
-            'unlockedStages'
+            'unlockedStages',
+            'predictionHistory',
+            'historyStats',
+            'groupStandings'
         ));
     }
 
@@ -196,7 +221,10 @@ class QuinielaController extends Controller
             'champion_team_id' => 'required|exists:teams,id',
         ]);
 
-        $deadline = Carbon::parse('2026-06-11 17:00:00');
+        // Deadline dinámica: lee primer partido de la BD
+        $firstGame = Game::where('stage', 'group')->orderBy('match_date', 'asc')->first();
+        $deadline  = $firstGame ? $firstGame->match_date : Carbon::parse('2026-06-11 13:00:00');
+
         if (Carbon::now()->isAfter($deadline)) {
             return back()->with('error', 'La selección del Campeón del Mundial ya está cerrada (el torneo ha comenzado).');
         }
@@ -470,5 +498,121 @@ class QuinielaController extends Controller
         $team = Team::find($championId);
         $count = $winners->count();
         return back()->with('success', "🏆 Campeón declarado: {$team->name}. Se otorgaron 50 pts a {$count} participante(s).");
+    }
+
+    // ==========================================
+    // HELPER: TABLA DE POSICIONES POR GRUPO (#7)
+    // ==========================================
+
+    private function calculateGroupStandings($games): array
+    {
+        $standings = [];
+        $groupGames = $games->where('stage', 'group')->where('status', 'finished');
+
+        foreach ($groupGames as $game) {
+            $homeTeam = $game->homeTeam;
+            $awayTeam = $game->awayTeam;
+
+            if (!$homeTeam || !$awayTeam) continue;
+            if ($homeTeam->group === 'TBD' || $awayTeam->group === 'TBD') continue;
+
+            $group = $homeTeam->group;
+            $hId = $homeTeam->id;
+            $aId = $awayTeam->id;
+
+            // Init entries
+            foreach ([$homeTeam, $awayTeam] as $team) {
+                $tid = $team->id;
+                if (!isset($standings[$group][$tid])) {
+                    $standings[$group][$tid] = [
+                        'team' => $team,
+                        'pj'   => 0, 'g' => 0, 'e' => 0, 'p' => 0,
+                        'gf'   => 0, 'gc' => 0, 'pts' => 0,
+                    ];
+                }
+            }
+
+            $hg = $game->home_score;
+            $ag = $game->away_score;
+
+            $standings[$group][$hId]['pj']++;
+            $standings[$group][$aId]['pj']++;
+            $standings[$group][$hId]['gf'] += $hg;
+            $standings[$group][$hId]['gc'] += $ag;
+            $standings[$group][$aId]['gf'] += $ag;
+            $standings[$group][$aId]['gc'] += $hg;
+
+            if ($hg > $ag) {
+                $standings[$group][$hId]['g']++;   $standings[$group][$hId]['pts'] += 3;
+                $standings[$group][$aId]['p']++;
+            } elseif ($ag > $hg) {
+                $standings[$group][$aId]['g']++;   $standings[$group][$aId]['pts'] += 3;
+                $standings[$group][$hId]['p']++;
+            } else {
+                $standings[$group][$hId]['e']++;   $standings[$group][$hId]['pts']++;
+                $standings[$group][$aId]['e']++;   $standings[$group][$aId]['pts']++;
+            }
+        }
+
+        // Sort each group: pts DESC, gd DESC, gf DESC
+        foreach ($standings as $group => &$teams) {
+            usort($teams, function ($a, $b) {
+                $gdA = $a['gf'] - $a['gc'];
+                $gdB = $b['gf'] - $b['gc'];
+                if ($b['pts'] !== $a['pts']) return $b['pts'] - $a['pts'];
+                if ($gdB !== $gdA) return $gdB - $gdA;
+                return $b['gf'] - $a['gf'];
+            });
+        }
+        unset($teams);
+
+        ksort($standings);
+        return $standings;
+    }
+
+    // ==========================================
+    // EXPORTAR PREDICCIONES CSV (#10)
+    // ==========================================
+
+    public function exportPredictions()
+    {
+        $user  = Auth::user();
+        $games = Game::with(['homeTeam', 'awayTeam'])
+                     ->where('status', 'finished')
+                     ->orderBy('match_date', 'asc')
+                     ->get();
+
+        $predictions = Prediction::where('user_id', $user->id)
+                                 ->get()->keyBy('game_id');
+
+        $filename = 'mis_pronosticos_' . now()->format('Ymd_His') . '.csv';
+        $headers  = [
+            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function () use ($games, $predictions) {
+            $handle = fopen('php://output', 'w');
+            // BOM for Excel UTF-8
+            fputs($handle, "\xEF\xBB\xBF");
+            fputcsv($handle, ['Fecha', 'Partido', 'Mi Pronóstico', 'Resultado Real', 'Puntos']);
+
+            foreach ($games as $game) {
+                $pred = $predictions->get($game->id);
+                $home = $game->homeTeam->name ?? '?';
+                $away = $game->awayTeam->name ?? '?';
+
+                fputcsv($handle, [
+                    $game->match_date->format('d/m/Y H:i'),
+                    "{$home} vs {$away}",
+                    $pred ? "{$pred->home_score} - {$pred->away_score}" : 'Sin pronóstico',
+                    $game->home_score . ' - ' . $game->away_score,
+                    $pred ? ($pred->points_earned ?? 0) : 0,
+                ]);
+            }
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

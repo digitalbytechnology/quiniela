@@ -178,91 +178,92 @@ class WorldCupSeeder extends Seeder
         // =====================================================================
         // Format: [home, away, date, stage]
         // Last 2 games of each group (MD3) played simultaneously
+        // Horarios en hora de Guatemala (UTC-6) — fuente oficial
         $groupGames = [
-            // ── GROUP A ──
-            ['México', 'Sudáfrica', '2026-06-11 17:00:00', 'group'],
+            // ── GROUP A ──  (Jue 11 jun | Jue 18 jun | Mié 24 jun)
+            ['México', 'Sudáfrica', '2026-06-11 13:00:00', 'group'],
             ['Corea del Sur', 'Chequia', '2026-06-11 20:00:00', 'group'],
-            ['México', 'Corea del Sur', '2026-06-17 17:00:00', 'group'],
-            ['Sudáfrica', 'Chequia', '2026-06-17 20:00:00', 'group'],
-            ['México', 'Chequia', '2026-06-23 18:00:00', 'group'],
-            ['Sudáfrica', 'Corea del Sur', '2026-06-23 18:00:00', 'group'],
-            // ── GROUP B ──
-            ['Canadá', 'Bosnia y Herzegovina', '2026-06-12 17:00:00', 'group'],
-            ['Catar', 'Suiza', '2026-06-12 20:00:00', 'group'],
-            ['Canadá', 'Catar', '2026-06-18 17:00:00', 'group'],
-            ['Bosnia y Herzegovina', 'Suiza', '2026-06-18 20:00:00', 'group'],
-            ['Canadá', 'Suiza', '2026-06-24 18:00:00', 'group'],
-            ['Bosnia y Herzegovina', 'Catar', '2026-06-24 18:00:00', 'group'],
-            // ── GROUP C ──
-            ['Brasil', 'Escocia', '2026-06-13 14:00:00', 'group'],
-            ['Marruecos', 'Haití', '2026-06-13 20:00:00', 'group'],
-            ['Brasil', 'Marruecos', '2026-06-19 14:00:00', 'group'],
-            ['Haití', 'Escocia', '2026-06-19 20:00:00', 'group'],
-            ['Brasil', 'Haití', '2026-06-25 18:00:00', 'group'],
-            ['Marruecos', 'Escocia', '2026-06-25 18:00:00', 'group'],
-            // ── GROUP D ──
-            ['Estados Unidos', 'Paraguay', '2026-06-12 20:00:00', 'group'],
-            ['Australia', 'Turquía', '2026-06-13 17:00:00', 'group'],
-            ['Estados Unidos', 'Australia', '2026-06-19 17:00:00', 'group'],
-            ['Paraguay', 'Turquía', '2026-06-19 23:00:00', 'group'],
-            ['Estados Unidos', 'Turquía', '2026-06-26 18:00:00', 'group'],
-            ['Paraguay', 'Australia', '2026-06-26 18:00:00', 'group'],
-            // ── GROUP E ──
-            ['Alemania', 'Ecuador', '2026-06-13 17:00:00', 'group'],
-            ['Curazao', 'Costa de Marfil', '2026-06-14 14:00:00', 'group'],
-            ['Alemania', 'Curazao', '2026-06-20 17:00:00', 'group'],
-            ['Costa de Marfil', 'Ecuador', '2026-06-20 20:00:00', 'group'],
-            ['Alemania', 'Costa de Marfil', '2026-06-26 21:00:00', 'group'],
-            ['Curazao', 'Ecuador', '2026-06-26 21:00:00', 'group'],
-            // ── GROUP F ──
-            ['Países Bajos', 'Japón', '2026-06-14 17:00:00', 'group'],
-            ['Suecia', 'Túnez', '2026-06-15 14:00:00', 'group'],
-            ['Japón', 'Suecia', '2026-06-21 14:00:00', 'group'],
-            ['Países Bajos', 'Túnez', '2026-06-21 17:00:00', 'group'],
-            ['Japón', 'Túnez', '2026-06-27 18:00:00', 'group'],
-            ['Países Bajos', 'Suecia', '2026-06-27 18:00:00', 'group'],
-            // ── GROUP G ──
-            ['Bélgica', 'Egipto', '2026-06-14 20:00:00', 'group'],
-            ['Irán', 'Nueva Zelanda', '2026-06-15 17:00:00', 'group'],
-            ['Bélgica', 'Irán', '2026-06-21 20:00:00', 'group'],
-            ['Egipto', 'Nueva Zelanda', '2026-06-21 23:00:00', 'group'],
-            ['Bélgica', 'Nueva Zelanda', '2026-06-28 18:00:00', 'group'],
-            ['Egipto', 'Irán', '2026-06-28 18:00:00', 'group'],
-            // ── GROUP H ──
-            ['España', 'Uruguay', '2026-06-14 14:00:00', 'group'],
-            ['Cabo Verde', 'Arabia Saudita', '2026-06-15 20:00:00', 'group'],
-            ['España', 'Cabo Verde', '2026-06-22 14:00:00', 'group'],
-            ['Arabia Saudita', 'Uruguay', '2026-06-22 17:00:00', 'group'],
-            ['España', 'Arabia Saudita', '2026-06-29 18:00:00', 'group'],
-            ['Cabo Verde', 'Uruguay', '2026-06-29 18:00:00', 'group'],
-            // ── GROUP I ──
-            ['Francia', 'Noruega', '2026-06-14 17:00:00', 'group'],
-            ['Senegal', 'Irak', '2026-06-16 14:00:00', 'group'],
-            ['Francia', 'Senegal', '2026-06-22 20:00:00', 'group'],
-            ['Irak', 'Noruega', '2026-06-22 23:00:00', 'group'],
-            ['Francia', 'Irak', '2026-06-29 21:00:00', 'group'],
-            ['Senegal', 'Noruega', '2026-06-29 21:00:00', 'group'],
-            // ── GROUP J ──
-            ['Argentina', 'Austria', '2026-06-15 15:00:00', 'group'],
-            ['Argelia', 'Jordania', '2026-06-16 17:00:00', 'group'],
-            ['Argentina', 'Argelia', '2026-06-23 17:00:00', 'group'],
-            ['Austria', 'Jordania', '2026-06-23 20:00:00', 'group'],
-            ['Argentina', 'Jordania', '2026-06-30 18:00:00', 'group'],
-            ['Argelia', 'Austria', '2026-06-30 18:00:00', 'group'],
-            // ── GROUP K ──
-            ['Colombia', 'RD Congo', '2026-06-16 20:00:00', 'group'],
-            ['Portugal', 'Uzbekistán', '2026-06-17 14:00:00', 'group'],
-            ['Colombia', 'Portugal', '2026-06-24 17:00:00', 'group'],
-            ['RD Congo', 'Uzbekistán', '2026-06-24 20:00:00', 'group'],
-            ['Colombia', 'Uzbekistán', '2026-07-01 18:00:00', 'group'],
-            ['RD Congo', 'Portugal', '2026-07-01 18:00:00', 'group'],
-            // ── GROUP L ──
-            ['Inglaterra', 'Croacia', '2026-06-15 18:00:00', 'group'],
-            ['Ghana', 'Panamá', '2026-06-16 23:00:00', 'group'],
+            ['Chequia', 'Sudáfrica', '2026-06-18 10:00:00', 'group'],
+            ['México', 'Corea del Sur', '2026-06-18 19:00:00', 'group'],
+            ['Sudáfrica', 'Corea del Sur', '2026-06-24 19:00:00', 'group'],
+            ['Chequia', 'México', '2026-06-24 19:00:00', 'group'],
+            // ── GROUP B ──  (Vie 12 jun | Jue 18 jun | Mié 24 jun)
+            ['Canadá', 'Bosnia y Herzegovina', '2026-06-12 13:00:00', 'group'],
+            ['Catar', 'Suiza', '2026-06-13 13:00:00', 'group'],
+            ['Suiza', 'Bosnia y Herzegovina', '2026-06-18 13:00:00', 'group'],
+            ['Canadá', 'Catar', '2026-06-18 16:00:00', 'group'],
+            ['Suiza', 'Canadá', '2026-06-24 13:00:00', 'group'],
+            ['Bosnia y Herzegovina', 'Catar', '2026-06-24 13:00:00', 'group'],
+            // ── GROUP C ──  (Sáb 13 jun | Vie 19 jun | Mié 24 jun)
+            ['Brasil', 'Marruecos', '2026-06-13 16:00:00', 'group'],
+            ['Haití', 'Escocia', '2026-06-13 19:00:00', 'group'],
+            ['Escocia', 'Marruecos', '2026-06-19 16:00:00', 'group'],
+            ['Brasil', 'Haití', '2026-06-19 18:30:00', 'group'],
+            ['Marruecos', 'Haití', '2026-06-24 16:00:00', 'group'],
+            ['Escocia', 'Brasil', '2026-06-24 16:00:00', 'group'],
+            // ── GROUP D ──  (Vie 12 jun | Vie 19 jun | Jue 25 jun)
+            ['Estados Unidos', 'Paraguay', '2026-06-12 19:00:00', 'group'],
+            ['Australia', 'Turquía', '2026-06-13 22:00:00', 'group'],
+            ['Estados Unidos', 'Australia', '2026-06-19 13:00:00', 'group'],
+            ['Turquía', 'Paraguay', '2026-06-19 21:00:00', 'group'],
+            ['Turquía', 'Estados Unidos', '2026-06-25 20:00:00', 'group'],
+            ['Paraguay', 'Australia', '2026-06-25 20:00:00', 'group'],
+            // ── GROUP E ──  (Dom 14 jun | Sáb 20 jun | Jue 25 jun)
+            ['Alemania', 'Curazao', '2026-06-14 11:00:00', 'group'],
+            ['Costa de Marfil', 'Ecuador', '2026-06-14 17:00:00', 'group'],
+            ['Alemania', 'Costa de Marfil', '2026-06-20 14:00:00', 'group'],
+            ['Ecuador', 'Curazao', '2026-06-20 18:00:00', 'group'],
+            ['Curazao', 'Costa de Marfil', '2026-06-25 14:00:00', 'group'],
+            ['Ecuador', 'Alemania', '2026-06-25 14:00:00', 'group'],
+            // ── GROUP F ──  (Dom 14 jun | Sáb 20 jun | Jue 25 jun)
+            ['Países Bajos', 'Japón', '2026-06-14 14:00:00', 'group'],
+            ['Suecia', 'Túnez', '2026-06-14 20:00:00', 'group'],
+            ['Países Bajos', 'Suecia', '2026-06-20 11:00:00', 'group'],
+            ['Túnez', 'Japón', '2026-06-20 22:00:00', 'group'],
+            ['Túnez', 'Países Bajos', '2026-06-25 17:00:00', 'group'],
+            ['Japón', 'Suecia', '2026-06-25 17:00:00', 'group'],
+            // ── GROUP G ──  (Lun 15 jun | Dom 21 jun | Vie 26 jun)
+            ['Bélgica', 'Egipto', '2026-06-15 13:00:00', 'group'],
+            ['Irán', 'Nueva Zelanda', '2026-06-15 19:00:00', 'group'],
+            ['Bélgica', 'Irán', '2026-06-21 13:00:00', 'group'],
+            ['Nueva Zelanda', 'Egipto', '2026-06-21 19:00:00', 'group'],
+            ['Nueva Zelanda', 'Bélgica', '2026-06-26 21:00:00', 'group'],
+            ['Egipto', 'Irán', '2026-06-26 21:00:00', 'group'],
+            // ── GROUP H ──  (Lun 15 jun | Dom 21 jun | Vie 26 jun)
+            ['España', 'Cabo Verde', '2026-06-15 10:00:00', 'group'],
+            ['Arabia Saudita', 'Uruguay', '2026-06-15 16:00:00', 'group'],
+            ['España', 'Arabia Saudita', '2026-06-21 10:00:00', 'group'],
+            ['Uruguay', 'Cabo Verde', '2026-06-21 16:00:00', 'group'],
+            ['Cabo Verde', 'Arabia Saudita', '2026-06-26 18:00:00', 'group'],
+            ['Uruguay', 'España', '2026-06-26 18:00:00', 'group'],
+            // ── GROUP I ──  (Mar 16 jun | Lun 22 jun | Vie 26 jun)
+            ['Francia', 'Senegal', '2026-06-16 13:00:00', 'group'],
+            ['Irak', 'Noruega', '2026-06-16 16:00:00', 'group'],
+            ['Francia', 'Irak', '2026-06-22 15:00:00', 'group'],
+            ['Noruega', 'Senegal', '2026-06-22 18:00:00', 'group'],
+            ['Noruega', 'Francia', '2026-06-26 13:00:00', 'group'],
+            ['Senegal', 'Irak', '2026-06-26 13:00:00', 'group'],
+            // ── GROUP J ──  (Mar 16 jun | Lun 22 jun | Sáb 27 jun)
+            ['Argentina', 'Argelia', '2026-06-16 19:00:00', 'group'],
+            ['Austria', 'Jordania', '2026-06-16 22:00:00', 'group'],
+            ['Argentina', 'Austria', '2026-06-22 11:00:00', 'group'],
+            ['Jordania', 'Argelia', '2026-06-22 21:00:00', 'group'],
+            ['Argelia', 'Austria', '2026-06-27 20:00:00', 'group'],
+            ['Jordania', 'Argentina', '2026-06-27 20:00:00', 'group'],
+            // ── GROUP K ──  (Mié 17 jun | Mar 23 jun | Sáb 27 jun)
+            ['Portugal', 'RD Congo', '2026-06-17 11:00:00', 'group'],
+            ['Uzbekistán', 'Colombia', '2026-06-17 20:00:00', 'group'],
+            ['Portugal', 'Uzbekistán', '2026-06-23 11:00:00', 'group'],
+            ['Colombia', 'RD Congo', '2026-06-23 20:00:00', 'group'],
+            ['Colombia', 'Portugal', '2026-06-27 17:30:00', 'group'],
+            ['RD Congo', 'Uzbekistán', '2026-06-27 17:30:00', 'group'],
+            // ── GROUP L ──  (Mié 17 jun | Mar 23 jun | Sáb 27 jun)
+            ['Inglaterra', 'Croacia', '2026-06-17 14:00:00', 'group'],
+            ['Ghana', 'Panamá', '2026-06-17 17:00:00', 'group'],
             ['Inglaterra', 'Ghana', '2026-06-23 14:00:00', 'group'],
-            ['Croacia', 'Panamá', '2026-06-24 23:00:00', 'group'],
-            ['Inglaterra', 'Panamá', '2026-07-01 21:00:00', 'group'],
-            ['Croacia', 'Ghana', '2026-07-01 21:00:00', 'group'],
+            ['Panamá', 'Croacia', '2026-06-23 17:00:00', 'group'],
+            ['Panamá', 'Inglaterra', '2026-06-27 15:00:00', 'group'],
+            ['Croacia', 'Ghana', '2026-06-27 15:00:00', 'group'],
         ];
 
         foreach ($groupGames as $g) {
@@ -280,44 +281,30 @@ class WorldCupSeeder extends Seeder
         // 5. Knockout Stage Games (32 total)
         // =====================================================================
 
-        // — Round of 32 (R32): 16 games — Jul 4–11
-        $r32Games = [
-            [$r32Teams[0], $r32Teams[3], '2026-07-04 14:00:00'],  // 1°A vs 2°B
-            [$r32Teams[2], $r32Teams[5], '2026-07-04 18:00:00'],  // 1°C vs 2°D
-            [$r32Teams[4], $r32Teams[7], '2026-07-04 21:00:00'],  // 1°E vs 2°F
-            [$r32Teams[24], $r32Teams[25], '2026-07-05 14:00:00'],  // Mejor3°1 vs Mejor3°2
-            [$r32Teams[1], $r32Teams[2], '2026-07-05 18:00:00'],  // 2°A vs 1°B (corrected)
-            [$r32Teams[3], $r32Teams[0], '2026-07-05 21:00:00'],  // 2°B vs 1°A - wait this duplicates...
-        ];
-        // Actually, let me redo R32 properly without duplicates
-        // 1A vs 2B, 2A vs 1B, 1C vs 2D, 2C vs 1D, 1E vs 2F, 2E vs 1F,
-        // 1G vs 2H, 2G vs 1H, 1I vs 2J, 2I vs 1J, 1K vs 2L, 2K vs 1L,
-        // + 4 games with best 3rd place teams
+        // — Dieciseisavos (R32): 16 partidos — fuente oficial hora Guatemala
         $r32GameData = [
-            // Jul 4
-            [$r32Teams[0], $r32Teams[3], '2026-07-04 14:00:00'],  // 1°A vs 2°B
-            [$r32Teams[1], $r32Teams[2], '2026-07-04 18:00:00'],  // 2°A vs 1°B
-            // Jul 5
-            [$r32Teams[4], $r32Teams[7], '2026-07-05 14:00:00'],  // 1°C vs 2°D
-            [$r32Teams[5], $r32Teams[6], '2026-07-05 18:00:00'],  // 2°C vs 1°D
-            // Jul 6
-            [$r32Teams[8], $r32Teams[11], '2026-07-06 14:00:00'],  // 1°E vs 2°F
-            [$r32Teams[9], $r32Teams[10], '2026-07-06 18:00:00'],  // 2°E vs 1°F
-            // Jul 7
-            [$r32Teams[12], $r32Teams[15], '2026-07-07 14:00:00'],  // 1°G vs 2°H
-            [$r32Teams[13], $r32Teams[14], '2026-07-07 18:00:00'],  // 2°G vs 1°H
-            // Jul 8
-            [$r32Teams[16], $r32Teams[19], '2026-07-08 14:00:00'],  // 1°I vs 2°J
-            [$r32Teams[17], $r32Teams[18], '2026-07-08 18:00:00'],  // 2°I vs 1°J
-            // Jul 9
-            [$r32Teams[20], $r32Teams[23], '2026-07-09 14:00:00'],  // 1°K vs 2°L
-            [$r32Teams[21], $r32Teams[22], '2026-07-09 18:00:00'],  // 2°K vs 1°L
-            // Jul 10 — Best 3rd place
-            [$r32Teams[24], $r32Teams[25], '2026-07-10 14:00:00'],  // M3°1 vs M3°2
-            [$r32Teams[26], $r32Teams[27], '2026-07-10 18:00:00'],  // M3°3 vs M3°4
-            // Jul 11 — Best 3rd place
-            [$r32Teams[28], $r32Teams[29], '2026-07-11 14:00:00'],  // M3°5 vs M3°6
-            [$r32Teams[30], $r32Teams[31], '2026-07-11 18:00:00'],  // M3°7 vs M3°8
+            // Dom 28 jun
+            [$r32Teams[0],  $r32Teams[3],  '2026-06-28 13:00:00'],  // Llave 3:  2°A vs 2°B
+            // Lun 29 jun
+            [$r32Teams[4],  $r32Teams[7],  '2026-06-29 11:00:00'],  // Llave 9:  1°C vs 2°F
+            [$r32Teams[8],  $r32Teams[11], '2026-06-29 14:30:00'],  // Llave 1:  1°E vs 3°(A-B-C-D-F)
+            [$r32Teams[12], $r32Teams[15], '2026-06-29 19:00:00'],  // Llave 4:  1°F vs 2°C
+            // Mar 30 jun
+            [$r32Teams[16], $r32Teams[19], '2026-06-30 11:00:00'],  // Llave 10: 2°E vs 2°I
+            [$r32Teams[20], $r32Teams[23], '2026-06-30 15:00:00'],  // Llave 2:  1°I vs 3°(C-D-F-G-H)
+            [$r32Teams[1],  $r32Teams[2],  '2026-06-30 19:00:00'],  // Llave 11: 1°A vs 3°(C-E-F-H-I)
+            // Mié 1 jul
+            [$r32Teams[5],  $r32Teams[6],  '2026-07-01 10:00:00'],  // Llave 12: 1°L vs 3°(E-H-I-J-K)
+            [$r32Teams[9],  $r32Teams[10], '2026-07-01 14:00:00'],  // Llave 8:  1°G vs 3°(A-E-H-I-J)
+            [$r32Teams[13], $r32Teams[14], '2026-07-01 18:00:00'],  // Llave 7:  1°D vs 3°(B-E-F-I-J)
+            // Jue 2 jul
+            [$r32Teams[17], $r32Teams[18], '2026-07-02 13:00:00'],  // Llave 6:  1°H vs 2°J
+            [$r32Teams[21], $r32Teams[22], '2026-07-02 17:00:00'],  // Llave 5:  2°K vs 2°L
+            [$r32Teams[24], $r32Teams[25], '2026-07-02 21:00:00'],  // Llave 15: 1°B vs 3°(E-F-G-I-J)
+            // Vie 3 jul
+            [$r32Teams[26], $r32Teams[27], '2026-07-03 12:00:00'],  // Llave 14: 2°D vs 2°G
+            [$r32Teams[28], $r32Teams[29], '2026-07-03 16:00:00'],  // Llave 13: 1°J vs 2°H
+            [$r32Teams[30], $r32Teams[31], '2026-07-03 19:30:00'],  // Llave 16: 1°K vs 3°(D-E-I-J-L)
         ];
         foreach ($r32GameData as $g) {
             Game::updateOrCreate(
@@ -326,16 +313,20 @@ class WorldCupSeeder extends Seeder
             );
         }
 
-        // — Round of 16 (R16): 8 games — Jul 13–16
+        // — Octavos de final (R16): 8 partidos — 4 al 7 jul — fuente oficial hora Guatemala
         $r16GameData = [
-            [$r16Teams[0], $r16Teams[1], '2026-07-13 18:00:00'],
-            [$r16Teams[2], $r16Teams[3], '2026-07-13 21:00:00'],
-            [$r16Teams[4], $r16Teams[5], '2026-07-14 18:00:00'],
-            [$r16Teams[6], $r16Teams[7], '2026-07-14 21:00:00'],
-            [$r16Teams[8], $r16Teams[9], '2026-07-15 18:00:00'],
-            [$r16Teams[10], $r16Teams[11], '2026-07-15 21:00:00'],
-            [$r16Teams[12], $r16Teams[13], '2026-07-16 18:00:00'],
-            [$r16Teams[14], $r16Teams[15], '2026-07-16 21:00:00'],
+            // Sáb 4 jul
+            [$r16Teams[0], $r16Teams[1], '2026-07-04 11:00:00'],  // Llave 2: G73 vs G75
+            [$r16Teams[2], $r16Teams[3], '2026-07-04 15:00:00'],  // Llave 1: G74 vs G77
+            // Dom 5 jul
+            [$r16Teams[4], $r16Teams[5], '2026-07-05 14:00:00'],  // Llave 5: G76 vs G78
+            [$r16Teams[6], $r16Teams[7], '2026-07-05 18:00:00'],  // Llave 6: G79 vs G80
+            // Lun 6 jul
+            [$r16Teams[8], $r16Teams[9], '2026-07-06 13:00:00'],  // Llave 3: G83 vs G84
+            [$r16Teams[10], $r16Teams[11], '2026-07-06 18:00:00'],  // Llave 4: G81 vs G82
+            // Mar 7 jul
+            [$r16Teams[12], $r16Teams[13], '2026-07-07 10:00:00'],  // Llave 7: G86 vs G88
+            [$r16Teams[14], $r16Teams[15], '2026-07-07 14:00:00'],  // Llave 8: G85 vs G87
         ];
         foreach ($r16GameData as $g) {
             Game::updateOrCreate(
@@ -344,12 +335,12 @@ class WorldCupSeeder extends Seeder
             );
         }
 
-        // — Quarterfinals (QF): 4 games — Jul 18–19
+        // — Cuartos de final (QF): 4 partidos — 9 al 11 jul — fuente oficial hora Guatemala
         $qfGameData = [
-            [$qfTeams[0], $qfTeams[1], '2026-07-18 18:00:00'],
-            [$qfTeams[2], $qfTeams[3], '2026-07-18 21:00:00'],
-            [$qfTeams[4], $qfTeams[5], '2026-07-19 18:00:00'],
-            [$qfTeams[6], $qfTeams[7], '2026-07-19 21:00:00'],
+            [$qfTeams[0], $qfTeams[1], '2026-07-09 14:00:00'],   // Jue 9 jul
+            [$qfTeams[2], $qfTeams[3], '2026-07-10 13:00:00'],   // Vie 10 jul
+            [$qfTeams[4], $qfTeams[5], '2026-07-11 15:00:00'],   // Sáb 11 jul
+            [$qfTeams[6], $qfTeams[7], '2026-07-11 19:00:00'],   // Sáb 11 jul
         ];
         foreach ($qfGameData as $g) {
             Game::updateOrCreate(
@@ -358,10 +349,10 @@ class WorldCupSeeder extends Seeder
             );
         }
 
-        // — Semifinals (SF): 2 games — Jul 22–23
+        // — Semifinales (SF): 2 partidos — 14 y 15 jul — fuente oficial hora Guatemala
         $sfGameData = [
-            [$sfTeams[0], $sfTeams[1], '2026-07-22 18:00:00'],
-            [$sfTeams[2], $sfTeams[3], '2026-07-23 18:00:00'],
+            [$sfTeams[0], $sfTeams[1], '2026-07-14 13:00:00'],  // Mar 14 jul 13:00
+            [$sfTeams[2], $sfTeams[3], '2026-07-15 13:00:00'],  // Mié 15 jul 13:00
         ];
         foreach ($sfGameData as $g) {
             Game::updateOrCreate(
@@ -370,15 +361,15 @@ class WorldCupSeeder extends Seeder
             );
         }
 
-        // — Third Place: 1 game — Jul 25
+        // — Tercer Lugar: 1 partido — Sáb 18 jul 15:00 GT
         Game::updateOrCreate(
-            ['home_team_id' => $thirdHome->id, 'away_team_id' => $thirdAway->id, 'match_date' => Carbon::parse('2026-07-25 15:00:00')],
+            ['home_team_id' => $thirdHome->id, 'away_team_id' => $thirdAway->id, 'match_date' => Carbon::parse('2026-07-18 15:00:00')],
             ['stage' => 'third_place', 'status' => 'pending']
         );
 
-        // — Final: 1 game — Jul 26
+        // — Final: 1 partido — Dom 19 jul 13:00 GT
         Game::updateOrCreate(
-            ['home_team_id' => $finalHome->id, 'away_team_id' => $finalAway->id, 'match_date' => Carbon::parse('2026-07-26 15:00:00')],
+            ['home_team_id' => $finalHome->id, 'away_team_id' => $finalAway->id, 'match_date' => Carbon::parse('2026-07-19 13:00:00')],
             ['stage' => 'final', 'status' => 'pending']
         );
 
