@@ -47,7 +47,10 @@ Route::middleware(['auth'])->group(function () {
 
             // Borrar todos los partidos y resembrar
             \App\Models\Game::query()->delete();
-            \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'WorldCupSeeder']);
+            \Illuminate\Support\Facades\Artisan::call('db:seed', [
+                '--class' => 'WorldCupSeeder',
+                '--force' => true
+            ]);
             
             return '¡Caché limpiada y partidos re-creados exitosamente! Por favor recarga el dashboard y verifica.';
         } catch (\Exception $e) {
