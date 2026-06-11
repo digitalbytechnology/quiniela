@@ -32,6 +32,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/print-results',     [QuinielaController::class, 'printResults'])->name('admin.print_results');
     Route::post('/admin/declare-champion', [QuinielaController::class, 'declareChampion'])->name('admin.champion.declare');
 
+    // Admin Users routes
+    Route::get('/admin/users',             [QuinielaController::class, 'usersDashboard'])->name('admin.users.index');
+    Route::post('/admin/users/{id}/update',[QuinielaController::class, 'updateUserAdmin'])->name('admin.users.update');
+
     // RUTA TEMPORAL PARA ARREGLAR DUPLICADOS EN PRODUCCIÓN
     Route::get('/admin/fix-duplicados', function () {
         if (!auth()->check() || !auth()->user()->isAdmin()) {

@@ -31,10 +31,19 @@
                         ⚙️ Administrador
                     </a>
                 </li>
+                <li>
+                    <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.index') ? 'active' : '' }}">
+                        👥 Usuarios
+                    </a>
+                </li>
                 @endif
             </ul>
 
             <div class="user-info" style="display: flex; align-items: center; gap: 0.75rem;">
+                <div id="guatemala-clock" style="margin-right: 1rem; font-size: 0.85rem; font-weight: 700; color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 0.4rem 0.8rem; border-radius: 20px; border: 1px solid rgba(16, 185, 129, 0.2); display: flex; align-items: center; gap: 0.4rem;">
+                    ⏱️ <span id="clock-time">Cargando...</span> (Hora GT)
+                </div>
+
                 @if(auth()->user()->profile_picture)
                     <img src="{{ asset(auth()->user()->profile_picture) }}" alt="" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);">
                 @else
@@ -52,7 +61,10 @@
                 </form>
             </div>
             @else
-            <div class="nav-auth-buttons">
+            <div class="nav-auth-buttons" style="display: flex; align-items: center;">
+                <div id="guatemala-clock" style="margin-right: 1rem; font-size: 0.85rem; font-weight: 700; color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 0.4rem 0.8rem; border-radius: 20px; border: 1px solid rgba(16, 185, 129, 0.2); display: flex; align-items: center; gap: 0.4rem;">
+                    ⏱️ <span id="clock-time">Cargando...</span> (Hora GT)
+                </div>
                 <a href="{{ route('login') }}" class="btn btn-secondary btn-sm" style="margin-right: 0.5rem;">Entrar</a>
                 <a href="{{ route('register') }}" class="btn btn-primary btn-sm">Registrarse</a>
             </div>
@@ -86,5 +98,29 @@
     </footer>
 
     @yield('scripts')
+    
+    <script>
+        function updateClock() {
+            // Get current time in Guatemala timezone
+            const options = { 
+                timeZone: 'America/Guatemala',
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit',
+                hour12: true 
+            };
+            const formatter = new Intl.DateTimeFormat('es-GT', options);
+            const timeString = formatter.format(new Date());
+            
+            // Update all clock elements on the page
+            document.querySelectorAll('#clock-time').forEach(el => {
+                el.textContent = timeString;
+            });
+        }
+        
+        // Update immediately, then every second
+        updateClock();
+        setInterval(updateClock, 1000);
+    </script>
 </body>
 </html>

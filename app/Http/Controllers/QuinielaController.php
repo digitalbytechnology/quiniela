@@ -350,7 +350,7 @@ class QuinielaController extends Controller
                     ->whereNotNull('points_earned')
                     ->sum('points_earned');
                 $championBonus = $u->champion_points_awarded ? 50 : 0;
-                $u->points = $predPoints + $championBonus;
+                $u->points = $predPoints + $championBonus + $u->extra_points;
                 $u->save();
             }
         }
@@ -459,7 +459,7 @@ class QuinielaController extends Controller
 
                 // Add champion bonus if already awarded
                 $championBonus = $u->champion_points_awarded ? 50 : 0;
-                $u->points     = $predPoints + $championBonus;
+                $u->points     = $predPoints + $championBonus + $u->extra_points;
                 $u->save();
             }
         } else {
@@ -614,5 +614,51 @@ class QuinielaController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    // ==========================================
+    // MANAGE USERS
+    // ==========================================
+
+    public function usersDashboard()
+    {
+        if (!Auth::user()->isAdmin()) {
+            return redirect()->route('dashboard')->with('error', 'No tienes permisos de administrador.');
+        }
+
+        $users = User::orderBy('points', 'desc')->orderBy('name', 'asc')->get();
+        $realTeams = Team::whereNotIn('group', ['TBD'])->whereNotNull('group')->orderBy('name')->get();
+
+        return view('admin.users', compact('users', 'realTeams'));
+    }
+
+    public function updateUserAdmin(Request $request, $id)
+    {
+        if (!Auth::user()->isAdmin()) {
+            return redirect()->route('dashboard')->with('error', 'No tienes permisos de administrador.');
+        }
+
+        $user = User::findOrFail($id);
+
+        $request->validate([
+            'extra_points' => 'required|integer',
+            'champion_pick_team_id' => 'nullable|exists:teams,id',
+        ]);
+
+        $user->extra_points = $request->extra_points;
+        if ($request->has('champion_pick_team_id')) {
+            $user->champion_pick_team_id = $request->champion_pick_team_id;
+        }
+
+        // Recalculate total points
+        $predPoints = Prediction::where('user_id', $user->id)
+            ->whereNotNull('points_earned')
+            ->sum('points_earned');
+        $championBonus = $user->champion_points_awarded ? 50 : 0;
+        $user->points = $predPoints + $championBonus + $user->extra_points;
+
+        $user->save();
+
+        return redirect()->route('admin.users.index')->with('success', "Usuario {$user->name} actualizado exitosamente.");
     }
 }
