@@ -35,6 +35,7 @@ Route::middleware(['auth'])->group(function () {
     // Admin Users routes
     Route::get('/admin/users',             [QuinielaController::class, 'usersDashboard'])->name('admin.users.index');
     Route::post('/admin/users/{id}/update',[QuinielaController::class, 'updateUserAdmin'])->name('admin.users.update');
+    Route::delete('/admin/users/{id}',     [QuinielaController::class, 'deleteUserAdmin'])->name('admin.users.delete');
 
     // RUTA TEMPORAL PARA ARREGLAR DUPLICADOS EN PRODUCCIÓN
     Route::get('/admin/fix-duplicados', function () {

@@ -661,4 +661,23 @@ class QuinielaController extends Controller
 
         return redirect()->route('admin.users.index')->with('success', "Usuario {$user->name} actualizado exitosamente.");
     }
+
+    public function deleteUserAdmin($id)
+    {
+        if (!Auth::user()->isAdmin()) {
+            return redirect()->route('dashboard')->with('error', 'No tienes permisos de administrador.');
+        }
+
+        $user = User::findOrFail($id);
+
+        if ($user->isAdmin()) {
+            return redirect()->route('admin.users.index')->with('error', 'No puedes eliminar a un administrador.');
+        }
+
+        // Eliminar predicciones del usuario antes de eliminar el usuario
+        Prediction::where('user_id', $user->id)->delete();
+        $user->delete();
+
+        return redirect()->route('admin.users.index')->with('success', "Usuario {$user->name} eliminado exitosamente.");
+    }
 }

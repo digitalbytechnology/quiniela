@@ -51,31 +51,45 @@
                         <td style="padding: 1rem; text-align: center; font-weight: 600;">{{ $predPoints }}</td>
                         <td style="padding: 1rem; text-align: center; font-weight: 600; color: #10b981;">{{ $championPoints }}</td>
                         
-                        <form action="{{ route('admin.users.update', $user->id) }}" method="POST">
-                            @csrf
-                            <td style="padding: 1rem; text-align: center;">
-                                <input type="number" name="extra_points" value="{{ $user->extra_points }}" 
-                                    style="width: 70px; background: #1a1535; border: 1px solid var(--border-glass); border-radius: 8px; padding: 0.5rem; color: white; text-align: center;">
-                            </td>
-                            <td style="padding: 1rem; text-align: center; font-weight: 800; color: var(--primary); font-size: 1.1rem;">
-                                {{ $user->points }}
-                            </td>
-                            <td style="padding: 1rem;">
-                                <select name="champion_pick_team_id" style="width: 100%; max-width: 200px; background: #1a1535; border: 1px solid var(--border-glass); border-radius: 8px; padding: 0.5rem; color: white; font-size: 0.85rem;">
-                                    <option value="">-- Sin selección --</option>
-                                    @foreach($realTeams as $team)
-                                        <option value="{{ $team->id }}" {{ $user->champion_pick_team_id == $team->id ? 'selected' : '' }}>
-                                            {{ $team->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </td>
-                            <td style="padding: 1rem; text-align: right;">
-                                <button type="submit" class="btn btn-primary btn-sm" style="padding: 0.4rem 0.8rem; border-radius: 8px;">
+                        <td style="padding: 1rem; text-align: center;">
+                            <input type="number" id="input_extra_{{ $user->id }}" value="{{ $user->extra_points }}" 
+                                style="width: 70px; background: #1a1535; border: 1px solid var(--border-glass); border-radius: 8px; padding: 0.5rem; color: white; text-align: center;">
+                        </td>
+                        <td style="padding: 1rem; text-align: center; font-weight: 800; color: var(--primary); font-size: 1.1rem;">
+                            {{ $user->points }}
+                        </td>
+                        <td style="padding: 1rem;">
+                            <select id="select_champ_{{ $user->id }}" style="width: 100%; max-width: 200px; background: #1a1535; border: 1px solid var(--border-glass); border-radius: 8px; padding: 0.5rem; color: white; font-size: 0.85rem;">
+                                <option value="">-- Sin selección --</option>
+                                @foreach($realTeams as $team)
+                                    <option value="{{ $team->id }}" {{ $user->champion_pick_team_id == $team->id ? 'selected' : '' }}>
+                                        {{ $team->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </td>
+                        <td style="padding: 1rem; text-align: right; display: flex; gap: 0.5rem; justify-content: flex-end;">
+                            <form action="{{ route('admin.users.update', $user->id) }}" method="POST" id="form_update_{{ $user->id }}" style="display:inline;">
+                                @csrf
+                                <input type="hidden" name="extra_points" id="hidden_extra_{{ $user->id }}">
+                                <input type="hidden" name="champion_pick_team_id" id="hidden_champ_{{ $user->id }}">
+                                <button type="button" onclick="
+                                    document.getElementById('hidden_extra_{{ $user->id }}').value = document.getElementById('input_extra_{{ $user->id }}').value;
+                                    document.getElementById('hidden_champ_{{ $user->id }}').value = document.getElementById('select_champ_{{ $user->id }}').value;
+                                    document.getElementById('form_update_{{ $user->id }}').submit();
+                                " class="btn btn-primary btn-sm" style="padding: 0.4rem 0.8rem; border-radius: 8px;">
                                     💾 Guardar
                                 </button>
-                            </td>
-                        </form>
+                            </form>
+
+                            <form action="{{ route('admin.users.delete', $user->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que quieres eliminar a este usuario de forma permanente? Se borrarán todos sus pronósticos y puntos.');" style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); padding: 0.4rem 0.8rem; border-radius: 8px; cursor: pointer;">
+                                    🗑️ Eliminar
+                                </button>
+                            </form>
+                        </td>
                     </tr>
                 @endforeach
             </tbody>
