@@ -57,9 +57,6 @@
                     <p style="color: var(--text-muted); margin-top: 0.5rem;">Los partidos del torneo aparecerán aquí pronto.</p>
                 </div>
             @else
-                <form action="{{ route('predictions.save') }}" method="POST">
-                    @csrf
-                    
                     @php $inputIndex = 0; @endphp
                     @foreach($groupedGames as $stageName => $gamesList)
                         @php
@@ -119,11 +116,13 @@
                                         $isUrgent = !$hasStarted && $minutesLeft <= 180 && $minutesLeft > 0;
                                     @endphp
                                     
+                                    @if($canPredict)
+                                    <form action="{{ route('predictions.save') }}" method="POST" class="game-card" @if(!$isStageUnlocked) style="opacity: 0.65; filter: grayscale(30%);" @endif>
+                                        @csrf
+                                        <input type="hidden" name="predictions[0][game_id]" value="{{ $game->id }}">
+                                    @else
                                     <div class="game-card" @if(!$isStageUnlocked) style="opacity: 0.65; filter: grayscale(30%);" @endif>
-                                        <!-- Hidden Fields for Array Submit -->
-                                        @if($canPredict)
-                                            <input type="hidden" name="predictions[{{ $inputIndex }}][game_id]" value="{{ $game->id }}">
-                                        @endif
+                                    @endif
                                         
                                         <div class="game-header">
                                             <div class="game-date" style="display: flex; flex-direction: column; align-items: flex-start; gap: 0.15rem;">
@@ -172,9 +171,9 @@
                                                         <span class="vs-divider">VS</span>
                                                         <input type="number" value="{{ $prediction ? $prediction->away_score : '' }}" class="score-input" disabled placeholder="-">
                                                     @else
-                                                        <input type="number" name="predictions[{{ $inputIndex }}][home_score]" value="{{ $prediction ? $prediction->home_score : '' }}" class="score-input" min="0" required placeholder="-">
+                                                        <input type="number" name="predictions[0][home_score]" value="{{ $prediction ? $prediction->home_score : '' }}" class="score-input" min="0" required placeholder="-">
                                                         <span class="vs-divider">VS</span>
-                                                        <input type="number" name="predictions[{{ $inputIndex }}][away_score]" value="{{ $prediction ? $prediction->away_score : '' }}" class="score-input" min="0" required placeholder="-">
+                                                        <input type="number" name="predictions[0][away_score]" value="{{ $prediction ? $prediction->away_score : '' }}" class="score-input" min="0" required placeholder="-">
                                                     @endif
                                                 </div>
 
@@ -218,11 +217,21 @@
                                         @elseif($hasStarted && !$prediction)
                                             <div class="match-points-feedback" style="color: var(--danger); background: rgba(239, 68, 68, 0.05);">🔒 Cerrado (Sin Pronóstico)</div>
                                         @elseif(!$hasStarted && $prediction)
-                                            <div class="match-points-feedback" style="color: var(--accent); background: rgba(16, 185, 129, 0.05);">✍️ Modificar Pronóstico</div>
+                                            <div class="match-points-feedback" style="display: flex; justify-content: space-between; align-items: center; color: var(--accent); background: rgba(16, 185, 129, 0.05);">
+                                                <span>✍️ Modificar Pronóstico</span>
+                                                <button type="submit" class="btn btn-primary" style="padding: 0.4rem 1rem; font-size: 0.85rem; border-radius: 8px;">Guardar</button>
+                                            </div>
                                         @elseif(!$hasStarted && !$prediction)
-                                            <div class="match-points-feedback" style="color: var(--primary); background: rgba(99, 102, 241, 0.05);">📝 Pendiente de Pronóstico</div>
+                                            <div class="match-points-feedback" style="display: flex; justify-content: space-between; align-items: center; color: var(--primary); background: rgba(99, 102, 241, 0.05);">
+                                                <span>📝 Pendiente de Pronóstico</span>
+                                                <button type="submit" class="btn btn-primary" style="padding: 0.4rem 1rem; font-size: 0.85rem; border-radius: 8px;">Guardar</button>
+                                            </div>
                                         @endif
+                                    @if($canPredict)
+                                    </form>
+                                    @else
                                     </div>
+                                    @endif
                                     
                                     @if($canPredict)
                                         @php $inputIndex++; @endphp
@@ -232,15 +241,6 @@
                         </div>
                     @endforeach
 
-                    <!-- Floating Save Bar -->
-                    @if($inputIndex > 0)
-                        <div style="position: sticky; bottom: 20px; z-index: 10; display: flex; justify-content: center; margin-top: 3rem;">
-                            <button type="submit" class="btn btn-primary" style="font-size: 1.1rem; padding: 1rem 3rem; border-radius: 50px; box-shadow: 0 10px 25px rgba(99, 102, 241, 0.5);">
-                                💾 Guardar mis Pronósticos
-                            </button>
-                        </div>
-                    @endif
-                </form>
             @endif
         </div>
 
