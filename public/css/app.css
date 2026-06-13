@@ -730,26 +730,265 @@ footer {
     margin-top: 4rem;
 }
 
-/* Responsive Navbar */
+/* ═══════════════════════════════════════════════
+   RESPONSIVE — Tablets & Small Screens
+═══════════════════════════════════════════════ */
 @media (max-width: 768px) {
+    /* ── Navbar ── */
+    .navbar {
+        padding: 0.6rem 0;
+    }
     .navbar .nav-container {
         flex-wrap: wrap;
-        gap: 0.5rem;
+        gap: 0.4rem;
         justify-content: center;
+    }
+    .brand {
+        font-size: 1.2rem;
+    }
+    .nav-links {
+        gap: 0.75rem;
+        order: 3;
+        width: 100%;
+        justify-content: center;
+        padding-top: 0.4rem;
+        border-top: 1px solid var(--border-glass);
+        margin-top: 0.25rem;
+    }
+    .nav-link {
+        font-size: 0.8rem;
     }
     .user-info {
         flex-wrap: wrap;
         justify-content: center;
         width: 100%;
-        margin-top: 0.5rem;
+        margin-top: 0.35rem;
+        padding: 0.4rem 0.6rem;
+        gap: 0.5rem;
     }
     .user-name {
-        max-width: 100px;
+        max-width: 80px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        font-size: 0.85rem;
     }
     #guatemala-clock {
         margin-right: 0 !important;
+        font-size: 0.75rem !important;
+        padding: 0.3rem 0.6rem !important;
+    }
+    .points-badge {
+        font-size: 0.75rem;
+        padding: 0.2rem 0.55rem;
+    }
+    .user-info img,
+    .user-info div[style*="border-radius: 50%"] {
+        width: 32px !important;
+        height: 32px !important;
+    }
+    .btn-sm {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.75rem;
+    }
+
+    /* ── Container ── */
+    .container {
+        padding: 0 0.75rem;
+    }
+
+    /* ── Glass Cards ── */
+    .glass-card {
+        padding: 1.25rem;
+        border-radius: 14px;
+    }
+
+    /* ── Dashboard Layout ── */
+    .dashboard-grid {
+        flex-direction: column !important;
+    }
+
+    /* ── Tabs ── */
+    .tabs-header {
+        gap: 0;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 0.5rem;
+    }
+    .tabs-header::-webkit-scrollbar {
+        display: none;
+    }
+    .tab-btn {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.65rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    /* ── Stage Title ── */
+    .stage-title {
+        font-size: 1.15rem;
+        padding-left: 0.6rem;
+    }
+
+    /* ── Games Grid: single column ── */
+    .games-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem;
+    }
+
+    /* ── Game Cards ── */
+    .game-card {
+        padding: 1rem;
+        border-radius: 12px;
+        gap: 0.75rem;
+    }
+    .game-header {
+        font-size: 0.75rem;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+    }
+    .game-status {
+        font-size: 0.65rem !important;
+        padding: 0.1rem 0.4rem !important;
+    }
+
+    /* ── Teams: make them fit ── */
+    .game-teams {
+        gap: 0.5rem;
+    }
+    .team-flag {
+        width: 36px;
+        height: 24px;
+    }
+    .team-name {
+        font-size: 0.8rem;
+        max-width: 80px;
+    }
+
+    /* ── Score Inputs ── */
+    .score-input {
+        width: 42px;
+        height: 38px;
+        font-size: 1.1rem;
+        border-radius: 8px;
+    }
+    .vs-divider {
+        font-size: 0.75rem;
+    }
+
+    /* ── Match Points Feedback ── */
+    .match-points-feedback {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.5rem;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        justify-content: center;
+        text-align: center;
+    }
+
+    /* ── Leaderboard ── */
+    .leaderboard-table th {
+        padding: 0.6rem 0.5rem;
+        font-size: 0.7rem;
+    }
+    .leaderboard-table td {
+        padding: 0.7rem 0.5rem;
+        font-size: 0.8rem;
+    }
+    .rank-col {
+        width: 45px;
+        font-size: 0.95rem;
+    }
+
+    /* ── Rules ── */
+    .rules-item {
+        padding: 1rem;
+        gap: 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .rule-number {
+        width: 36px;
+        height: 36px;
+        font-size: 0.95rem;
+    }
+    .rule-content h4 {
+        font-size: 0.95rem;
+    }
+    .rule-content p {
+        font-size: 0.85rem;
+    }
+
+    /* ── Footer ── */
+    footer {
+        padding: 1.5rem 0;
+        font-size: 0.8rem;
+        margin-top: 2rem;
+    }
+
+    /* ── Dashboard Header ── */
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem !important;
+    }
+    .dashboard-title {
+        font-size: 1.4rem !important;
+        line-height: 1.2;
+    }
+    .dashboard-subtitle {
+        font-size: 0.85rem !important;
+    }
+    .points-summary {
+        width: 100%;
+    }
+    .points-card {
+        flex: 1;
+        min-width: unset !important;
+        padding: 0.6rem 0.75rem !important;
+    }
+    .points-value {
+        font-size: 1.5rem !important;
+    }
+}
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE — Small Phones (≤ 400px)
+═══════════════════════════════════════════════ */
+@media (max-width: 400px) {
+    .brand {
+        font-size: 1rem;
+    }
+    .dashboard-title {
+        font-size: 1.2rem !important;
+    }
+    .dashboard-subtitle {
+        font-size: 0.75rem !important;
+    }
+    .points-value {
+        font-size: 1.25rem !important;
+    }
+    .team-name {
+        font-size: 0.72rem;
+        max-width: 65px;
+    }
+    .team-flag {
+        width: 30px;
+        height: 20px;
+    }
+    .score-input {
+        width: 38px;
+        height: 34px;
+        font-size: 1rem;
+    }
+    .tab-btn {
+        font-size: 0.72rem;
+        padding: 0.35rem 0.5rem;
+    }
+    .game-card {
+        padding: 0.75rem;
     }
 }

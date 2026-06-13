@@ -3,22 +3,22 @@
 @section('title', 'Mi Quiniela - Pronósticos y Tabla General')
 
 @section('content')
-<div style="margin-bottom: 2.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+<div class="dashboard-header" style="margin-bottom: 2.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
     <div>
-        <h1 style="font-size: 2.25rem; font-weight: 800; background: linear-gradient(135deg, white, #cbd5e1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        <h1 class="dashboard-title" style="font-size: 2.25rem; font-weight: 800; background: linear-gradient(135deg, white, #cbd5e1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
             Quiniela Qatar a Norteamérica 2026
         </h1>
-        <p style="color: var(--text-muted); font-size: 1rem; margin-top: 0.25rem;">
+        <p class="dashboard-subtitle" style="color: var(--text-muted); font-size: 1rem; margin-top: 0.25rem;">
             Ingresa tus pronósticos, suma puntos y sube en la clasificación.
         </p>
     </div>
-    <div class="points-summary" style="display: flex; gap: 1.5rem;">
-        <div class="glass-card" style="padding: 1rem 1.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 120px; border-radius: 14px;">
-            <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Mis Puntos</span>
-            <span style="font-size: 2rem; font-weight: 800; color: var(--secondary);">{{ auth()->user()->points }}</span>
+    <div class="points-summary" style="display: flex; gap: 1rem;">
+        <div class="glass-card points-card" style="padding: 0.75rem 1.25rem; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 100px; border-radius: 14px;">
+            <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Mis Puntos</span>
+            <span class="points-value" style="font-size: 1.75rem; font-weight: 800; color: var(--secondary);">{{ auth()->user()->points }}</span>
         </div>
-        <div class="glass-card" style="padding: 1rem 1.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 120px; border-radius: 14px;">
-            <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Mi Ranking</span>
+        <div class="glass-card points-card" style="padding: 0.75rem 1.25rem; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 100px; border-radius: 14px;">
+            <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Mi Ranking</span>
             @php
                 $rank = 1;
                 foreach($leaderboard as $idx => $lUser) {
@@ -28,7 +28,7 @@
                     }
                 }
             @endphp
-            <span style="font-size: 2rem; font-weight: 800; color: var(--primary);">#{{ $rank }}</span>
+            <span class="points-value" style="font-size: 1.75rem; font-weight: 800; color: var(--primary);">#{{ $rank }}</span>
         </div>
     </div>
 </div>
