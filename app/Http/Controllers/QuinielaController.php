@@ -693,4 +693,22 @@ class QuinielaController extends Controller
 
         return redirect()->route('admin.users.index')->with('success', "Usuario {$user->name} eliminado exitosamente.");
     }
+
+    public function resetUserPassword(Request $request, $id)
+    {
+        if (!Auth::user()->isAdmin()) {
+            return redirect()->route('dashboard')->with('error', 'No tienes permisos de administrador.');
+        }
+
+        $user = User::findOrFail($id);
+
+        $request->validate([
+            'new_password' => 'required|string|min:4',
+        ]);
+
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return redirect()->route('admin.users.index')->with('success', "Contraseña de {$user->name} actualizada exitosamente.");
+    }
 }

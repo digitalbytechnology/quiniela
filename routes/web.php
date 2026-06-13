@@ -36,6 +36,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/users',             [QuinielaController::class, 'usersDashboard'])->name('admin.users.index');
     Route::post('/admin/users/{id}/update',[QuinielaController::class, 'updateUserAdmin'])->name('admin.users.update');
     Route::delete('/admin/users/{id}',     [QuinielaController::class, 'deleteUserAdmin'])->name('admin.users.delete');
+    Route::post('/admin/users/{id}/reset-password', [QuinielaController::class, 'resetUserPassword'])->name('admin.users.reset_password');
 
     // RUTA TEMPORAL PARA ARREGLAR DUPLICADOS EN PRODUCCIÓN
     Route::get('/admin/fix-duplicados', function () {
