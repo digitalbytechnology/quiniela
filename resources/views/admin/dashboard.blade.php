@@ -189,7 +189,7 @@
                                     <!-- Winner selection for knockout -->
                                     <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 0.1rem;">
                                         <span style="font-size: 0.6rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Clasifica:</span>
-                                        <select name="games[{{ $game->id }}][winner_id]" style="background: #1a1535; border: 1px solid var(--border-glass); border-radius: 8px; padding: 0.3rem; color: white; font-size: 0.75rem; outline: none; cursor: pointer; max-width: 115px;">
+                                        <select name="games[{{ $game->id }}][winner_id]" style="background: #1a1535; border: 1px solid var(--border-glass); border-radius: 8px; padding: 0.3rem; color: white; font-size: 0.75rem; outline: none; cursor: pointer; max-width: 115px;" {{ $isFinished ? 'disabled' : '' }}>
                                             <option value="">-- Auto --</option>
                                             @if(!$isHomePlaceholder)
                                                 <option value="{{ $homeTeam->id }}" {{ $game->winner_id == $homeTeam->id ? 'selected' : '' }}>{{ $homeTeam->name }}</option>
@@ -208,7 +208,8 @@
                                            class="score-input" 
                                            min="0" 
                                            placeholder="-" 
-                                           style="width: 42px; height: 36px; font-size: 1.05rem; border-radius: 8px;">
+                                           style="width: 42px; height: 36px; font-size: 1.05rem; border-radius: 8px;"
+                                           {{ $isFinished ? 'disabled' : '' }}>
                                     
                                     <span style="color: var(--text-muted); font-weight: 700; font-size: 0.8rem;">-</span>
 
@@ -218,16 +219,17 @@
                                            class="score-input" 
                                            min="0" 
                                            placeholder="-" 
-                                           style="width: 42px; height: 36px; font-size: 1.05rem; border-radius: 8px;">
+                                           style="width: 42px; height: 36px; font-size: 1.05rem; border-radius: 8px;"
+                                           {{ $isFinished ? 'disabled' : '' }}>
                                 </div>
 
                                 <div style="min-width: 80px; text-align: right; font-size: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-end;">
                                     @if($isFinished)
-                                        <span class="game-status status-finished" style="padding: 0.15rem 0.4rem; font-size: 0.7rem;">Registrado</span>
+                                        <span class="game-status status-finished" style="padding: 0.15rem 0.4rem; font-size: 0.7rem;">✅ Registrado</span>
                                     @else
                                         <span class="game-status status-pending" style="padding: 0.15rem 0.4rem; font-size: 0.7rem;">Pendiente</span>
+                                        <button type="submit" class="btn btn-primary btn-sm" style="padding: 0.3rem 0.8rem; font-size: 0.75rem;">Guardar</button>
                                     @endif
-                                    <button type="submit" class="btn btn-primary btn-sm" style="padding: 0.3rem 0.8rem; font-size: 0.75rem;">Guardar</button>
                                 </div>
                             </div>
                         </form>
