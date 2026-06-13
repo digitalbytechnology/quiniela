@@ -267,14 +267,24 @@ class WorldCupSeeder extends Seeder
         ];
 
         foreach ($groupGames as $g) {
-            Game::updateOrCreate(
-                [
-                    'home_team_id' => $T[$g[0]]->id,
-                    'away_team_id' => $T[$g[1]]->id,
-                    'match_date' => Carbon::parse($g[2]),
-                ],
-                ['stage' => $g[3], 'status' => 'pending']
-            );
+            $homeTeamId = $T[$g[0]]->id;
+            $awayTeamId = $T[$g[1]]->id;
+            $matchDate  = Carbon::parse($g[2]);
+
+            $exists = Game::where('home_team_id', $homeTeamId)
+                          ->where('away_team_id', $awayTeamId)
+                          ->where('match_date', $matchDate)
+                          ->exists();
+
+            if (!$exists) {
+                Game::create([
+                    'home_team_id' => $homeTeamId,
+                    'away_team_id' => $awayTeamId,
+                    'match_date'   => $matchDate,
+                    'stage'        => $g[3],
+                    'status'       => 'pending',
+                ]);
+            }
         }
 
         // =====================================================================
@@ -307,10 +317,19 @@ class WorldCupSeeder extends Seeder
             [$r32Teams[30], $r32Teams[31], '2026-07-03 19:30:00'],  // Llave 16: 1°K vs 3°(D-E-I-J-L)
         ];
         foreach ($r32GameData as $g) {
-            Game::updateOrCreate(
-                ['home_team_id' => $g[0]->id, 'away_team_id' => $g[1]->id, 'match_date' => Carbon::parse($g[2])],
-                ['stage' => 'r32', 'status' => 'pending']
-            );
+            $exists = Game::where('home_team_id', $g[0]->id)
+                          ->where('away_team_id', $g[1]->id)
+                          ->where('match_date', Carbon::parse($g[2]))
+                          ->exists();
+            if (!$exists) {
+                Game::create([
+                    'home_team_id' => $g[0]->id,
+                    'away_team_id' => $g[1]->id,
+                    'match_date'   => Carbon::parse($g[2]),
+                    'stage'        => 'r32',
+                    'status'       => 'pending',
+                ]);
+            }
         }
 
         // — Octavos de final (R16): 8 partidos — 4 al 7 jul — fuente oficial hora Guatemala
@@ -329,10 +348,19 @@ class WorldCupSeeder extends Seeder
             [$r16Teams[14], $r16Teams[15], '2026-07-07 14:00:00'],  // Llave 8: G85 vs G87
         ];
         foreach ($r16GameData as $g) {
-            Game::updateOrCreate(
-                ['home_team_id' => $g[0]->id, 'away_team_id' => $g[1]->id, 'match_date' => Carbon::parse($g[2])],
-                ['stage' => 'r16', 'status' => 'pending']
-            );
+            $exists = Game::where('home_team_id', $g[0]->id)
+                          ->where('away_team_id', $g[1]->id)
+                          ->where('match_date', Carbon::parse($g[2]))
+                          ->exists();
+            if (!$exists) {
+                Game::create([
+                    'home_team_id' => $g[0]->id,
+                    'away_team_id' => $g[1]->id,
+                    'match_date'   => Carbon::parse($g[2]),
+                    'stage'        => 'r16',
+                    'status'       => 'pending',
+                ]);
+            }
         }
 
         // — Cuartos de final (QF): 4 partidos — 9 al 11 jul — fuente oficial hora Guatemala
@@ -343,10 +371,19 @@ class WorldCupSeeder extends Seeder
             [$qfTeams[6], $qfTeams[7], '2026-07-11 19:00:00'],   // Sáb 11 jul
         ];
         foreach ($qfGameData as $g) {
-            Game::updateOrCreate(
-                ['home_team_id' => $g[0]->id, 'away_team_id' => $g[1]->id, 'match_date' => Carbon::parse($g[2])],
-                ['stage' => 'quarter', 'status' => 'pending']
-            );
+            $exists = Game::where('home_team_id', $g[0]->id)
+                          ->where('away_team_id', $g[1]->id)
+                          ->where('match_date', Carbon::parse($g[2]))
+                          ->exists();
+            if (!$exists) {
+                Game::create([
+                    'home_team_id' => $g[0]->id,
+                    'away_team_id' => $g[1]->id,
+                    'match_date'   => Carbon::parse($g[2]),
+                    'stage'        => 'quarter',
+                    'status'       => 'pending',
+                ]);
+            }
         }
 
         // — Semifinales (SF): 2 partidos — 14 y 15 jul — fuente oficial hora Guatemala
@@ -355,25 +392,54 @@ class WorldCupSeeder extends Seeder
             [$sfTeams[2], $sfTeams[3], '2026-07-15 13:00:00'],  // Mié 15 jul 13:00
         ];
         foreach ($sfGameData as $g) {
-            Game::updateOrCreate(
-                ['home_team_id' => $g[0]->id, 'away_team_id' => $g[1]->id, 'match_date' => Carbon::parse($g[2])],
-                ['stage' => 'semi', 'status' => 'pending']
-            );
+            $exists = Game::where('home_team_id', $g[0]->id)
+                          ->where('away_team_id', $g[1]->id)
+                          ->where('match_date', Carbon::parse($g[2]))
+                          ->exists();
+            if (!$exists) {
+                Game::create([
+                    'home_team_id' => $g[0]->id,
+                    'away_team_id' => $g[1]->id,
+                    'match_date'   => Carbon::parse($g[2]),
+                    'stage'        => 'semi',
+                    'status'       => 'pending',
+                ]);
+            }
         }
 
         // — Tercer Lugar: 1 partido — Sáb 18 jul 15:00 GT
-        Game::updateOrCreate(
-            ['home_team_id' => $thirdHome->id, 'away_team_id' => $thirdAway->id, 'match_date' => Carbon::parse('2026-07-18 15:00:00')],
-            ['stage' => 'third_place', 'status' => 'pending']
-        );
+        $thirdExists = Game::where('home_team_id', $thirdHome->id)
+                           ->where('away_team_id', $thirdAway->id)
+                           ->where('match_date', Carbon::parse('2026-07-18 15:00:00'))
+                           ->exists();
+        if (!$thirdExists) {
+            Game::create([
+                'home_team_id' => $thirdHome->id,
+                'away_team_id' => $thirdAway->id,
+                'match_date'   => Carbon::parse('2026-07-18 15:00:00'),
+                'stage'        => 'third_place',
+                'status'       => 'pending',
+            ]);
+        }
 
         // — Final: 1 partido — Dom 19 jul 13:00 GT
-        Game::updateOrCreate(
-            ['home_team_id' => $finalHome->id, 'away_team_id' => $finalAway->id, 'match_date' => Carbon::parse('2026-07-19 13:00:00')],
-            ['stage' => 'final', 'status' => 'pending']
-        );
+        $finalExists = Game::where('home_team_id', $finalHome->id)
+                           ->where('away_team_id', $finalAway->id)
+                           ->where('match_date', Carbon::parse('2026-07-19 13:00:00'))
+                           ->exists();
+        if (!$finalExists) {
+            Game::create([
+                'home_team_id' => $finalHome->id,
+                'away_team_id' => $finalAway->id,
+                'match_date'   => Carbon::parse('2026-07-19 13:00:00'),
+                'stage'        => 'final',
+                'status'       => 'pending',
+            ]);
+        }
 
-        // 6. Initialize champion setting
-        Setting::setValue('world_cup_champion', null);
+        // 6. Initialize champion setting (only if not already set)
+        if (!Setting::getValue('world_cup_champion')) {
+            Setting::setValue('world_cup_champion', null);
+        }
     }
 }
