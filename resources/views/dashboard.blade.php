@@ -616,10 +616,51 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+        // Restore last active tab
         const lastActiveTab = localStorage.getItem('activeQuinielaTab');
         if (lastActiveTab && document.getElementById(lastActiveTab)) {
             const btn = document.querySelector(`button[onclick*="${lastActiveTab}"]`);
             if (btn) btn.click();
+        }
+
+        // ── Auto-reload when a match starts ──
+        // Collect all match dates from the server
+        const matchDates = @json(
+            $groupedGames->flatten()->map(fn($g) => $g->match_date->toIso8601String())->values()
+        );
+
+        const now = Date.now();
+        let nearestFutureMs = null;
+        let hasLiveMatch = false;
+
+        matchDates.forEach(dateStr => {
+            const matchTime = new Date(dateStr).getTime();
+            const diff = matchTime - now;
+
+            if (diff > 0 && diff < 86400000) {
+                // Match starts within the next 24 hours
+                if (nearestFutureMs === null || diff < nearestFutureMs) {
+                    nearestFutureMs = diff;
+                }
+            }
+
+            // If a match started less than 3 hours ago, consider it "live"
+            if (diff <= 0 && diff > -10800000) {
+                hasLiveMatch = true;
+            }
+        });
+
+        // Schedule page reload at exact match start time (+ 2 second buffer)
+        if (nearestFutureMs !== null) {
+            const reloadDelay = nearestFutureMs + 2000;
+            console.log(`⚽ Auto-reload programado en ${Math.round(reloadDelay / 1000)}s cuando inicie el próximo partido.`);
+            setTimeout(() => location.reload(), reloadDelay);
+        }
+
+        // If there are live matches, soft-refresh every 5 minutes to catch status changes
+        if (hasLiveMatch) {
+            console.log('🔄 Partidos en juego detectados. Auto-refresh cada 5 minutos.');
+            setInterval(() => location.reload(), 300000);
         }
     });
 </script>
