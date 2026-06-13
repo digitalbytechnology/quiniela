@@ -98,9 +98,7 @@
         @endphp
 
         @foreach($groupedGames as $stageKey => $gamesList)
-            <form action="{{ route('admin.games.bulk_update') }}" method="POST" style="margin-bottom: 3rem; background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border-glass); border-radius: 20px; padding: 1.75rem; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
-                @csrf
-                <input type="hidden" name="stage_key" value="{{ $stageKey }}">
+            <div style="margin-bottom: 3rem; background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border-glass); border-radius: 20px; padding: 1.75rem; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
 
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
                     <h4 style="font-size: 1.3rem; font-weight: 700; color: var(--primary);">
@@ -120,7 +118,9 @@
                             $isHomePlaceholder = ($homeTeam->group === 'TBD');
                             $isAwayPlaceholder = ($awayTeam->group === 'TBD');
                         @endphp
-                        <div class="admin-row" style="background: {{ $isFinished ? 'rgba(16, 185, 129, 0.02)' : 'rgba(255,255,255,0.01)' }}; border-color: {{ $isFinished ? 'rgba(16, 185, 129, 0.15)' : 'var(--border-glass)' }}; padding: 1rem 1.25rem;">
+                        <form action="{{ route('admin.games.bulk_update') }}" method="POST" class="admin-row" style="background: {{ $isFinished ? 'rgba(16, 185, 129, 0.02)' : 'rgba(255,255,255,0.01)' }}; border-color: {{ $isFinished ? 'rgba(16, 185, 129, 0.15)' : 'var(--border-glass)' }}; padding: 1rem 1.25rem;">
+                            @csrf
+                            <input type="hidden" name="stage_key" value="{{ $stageKey }}">
                             
                             <!-- Game Info Section -->
                             <div class="admin-row-game" style="flex: 1.2; min-width: 280px;">
@@ -221,24 +221,20 @@
                                            style="width: 42px; height: 36px; font-size: 1.05rem; border-radius: 8px;">
                                 </div>
 
-                                <div style="min-width: 80px; text-align: right; font-size: 0.75rem;">
+                                <div style="min-width: 80px; text-align: right; font-size: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-end;">
                                     @if($isFinished)
                                         <span class="game-status status-finished" style="padding: 0.15rem 0.4rem; font-size: 0.7rem;">Registrado</span>
                                     @else
                                         <span class="game-status status-pending" style="padding: 0.15rem 0.4rem; font-size: 0.7rem;">Pendiente</span>
                                     @endif
+                                    <button type="submit" class="btn btn-primary btn-sm" style="padding: 0.3rem 0.8rem; font-size: 0.75rem;">Guardar</button>
                                 </div>
                             </div>
-                        </div>
+                        </form>
                     @endforeach
                 </div>
 
-                <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 1rem;">
-                    <button type="submit" class="btn btn-primary" style="font-size: 0.95rem; padding: 0.65rem 2rem; border-radius: 30px;">
-                        💾 Guardar Resultados de esta Fase
-                    </button>
-                </div>
-            </form>
+            </div>
         @endforeach
     @endif
 </div>
