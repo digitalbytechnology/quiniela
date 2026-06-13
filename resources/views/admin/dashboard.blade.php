@@ -233,6 +233,34 @@
                                 </div>
                             </div>
                         </form>
+
+                        {{-- Show all users' predictions for live games --}}
+                        @php
+                            $isLive = $game->match_date->isBefore(now()) && !$isFinished;
+                            $gamePredictions = $isLive && isset($livePredictions[$game->id]) ? $livePredictions[$game->id] : collect();
+                        @endphp
+                        @if($isLive && $gamePredictions->isNotEmpty())
+                            <div style="margin-top: -0.5rem; margin-bottom: 0.75rem; background: rgba(99, 102, 241, 0.04); border: 1px solid rgba(99, 102, 241, 0.15); border-radius: 12px; padding: 0.75rem 1rem; animation: fadeIn 0.4s ease;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.6rem;">
+                                    <span style="font-size: 0.9rem;">👀</span>
+                                    <span style="font-size: 0.8rem; font-weight: 700; color: var(--primary);">Pronósticos de los participantes ({{ $gamePredictions->count() }})</span>
+                                </div>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.4rem;">
+                                    @foreach($gamePredictions->sortBy(fn($p) => $p->user->name) as $pred)
+                                        @if($pred->user && $pred->user->role !== 'admin')
+                                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.35rem 0.6rem; background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 8px; font-size: 0.75rem;">
+                                            <span style="font-weight: 600; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px;" title="{{ $pred->user->name }}">{{ $pred->user->name }}</span>
+                                            <span style="font-weight: 800; color: white; white-space: nowrap;">{{ $pred->home_score }} - {{ $pred->away_score }}</span>
+                                        </div>
+                                        @endif
+                                    @endforeach
+                                </div>
+                            </div>
+                        @elseif($isLive && $gamePredictions->isEmpty())
+                            <div style="margin-top: -0.5rem; margin-bottom: 0.75rem; background: rgba(255,255,255,0.02); border: 1px dashed var(--border-glass); border-radius: 12px; padding: 0.6rem 1rem; font-size: 0.75rem; color: var(--text-muted); text-align: center;">
+                                🚫 Ningún participante registró pronóstico para este partido.
+                            </div>
+                        @endif
                     @endforeach
                 </div>
 

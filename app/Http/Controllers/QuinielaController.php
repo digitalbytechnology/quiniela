@@ -255,7 +255,20 @@ class QuinielaController extends Controller
         $worldChampionId = Setting::getValue('world_cup_champion');
         $worldChampion   = $worldChampionId ? Team::find($worldChampionId) : null;
 
-        return view('admin.dashboard', compact('groupedGames', 'realTeams', 'worldChampion', 'worldChampionId'));
+        // Predictions for live games (started but not finished) — admin can see all users' picks
+        $liveGameIds = $games->filter(function ($game) {
+            return $game->match_date->isBefore(now()) && $game->status !== 'finished';
+        })->pluck('id');
+
+        $livePredictions = [];
+        if ($liveGameIds->isNotEmpty()) {
+            $livePredictions = Prediction::whereIn('game_id', $liveGameIds)
+                ->with('user')
+                ->get()
+                ->groupBy('game_id');
+        }
+
+        return view('admin.dashboard', compact('groupedGames', 'realTeams', 'worldChampion', 'worldChampionId', 'livePredictions'));
     }
 
     public function bulkUpdateGames(Request $request)
