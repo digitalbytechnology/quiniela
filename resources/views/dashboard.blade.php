@@ -128,9 +128,15 @@
                                             <div class="game-date" style="display: flex; flex-direction: column; align-items: flex-start; gap: 0.15rem;">
                                                 <span>📅 {{ $game->match_date->format('d/m/Y H:i') }}</span>
                                                 @if($isUrgent)
-                                                    <span style="font-size: 0.75rem; color: #f59e0b; font-weight: 700; animation: pulse 1.5s infinite;">
-                                                        ⚡ ¡Cierra en {{ $minutesLeft }} min!
-                                                    </span>
+                                                    @if($minutesLeft <= 60)
+                                                        <span class="countdown-timer" data-deadline="{{ $game->match_date->toIso8601String() }}" style="font-size: 0.75rem; color: #f59e0b; font-weight: 700; animation: pulse 1.5s infinite;">
+                                                            ⚡ ¡Cierra en <span class="timer-display">Cargando...</span>!
+                                                        </span>
+                                                    @else
+                                                        <span style="font-size: 0.75rem; color: #f59e0b; font-weight: 700; animation: pulse 1.5s infinite;">
+                                                            ⚡ ¡Cierra en {{ round($minutesLeft) }} min!
+                                                        </span>
+                                                    @endif
                                                 @elseif(!$hasStarted && !$isFinished)
                                                     <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">
                                                         ⏰ Límite: {{ $game->match_date->format('H:i') }}
@@ -661,6 +667,38 @@
         if (hasLiveMatch) {
             console.log('🔄 Partidos en juego detectados. Auto-refresh cada 5 minutos.');
             setInterval(() => location.reload(), 300000);
+        }
+
+        // Countdown timers for urgent matches
+        const timerElements = document.querySelectorAll('.countdown-timer');
+        if (timerElements.length > 0) {
+            setInterval(() => {
+                const nowMs = Date.now();
+                timerElements.forEach(el => {
+                    const deadlineStr = el.getAttribute('data-deadline');
+                    if (!deadlineStr) return;
+                    const deadlineMs = new Date(deadlineStr).getTime();
+                    let diff = deadlineMs - nowMs;
+                    
+                    const displayEl = el.querySelector('.timer-display');
+                    if (!displayEl) return;
+                    
+                    if (diff <= 0) {
+                        displayEl.textContent = "00:00";
+                        return;
+                    }
+                    
+                    // calculate mm:ss
+                    const totalSeconds = Math.floor(diff / 1000);
+                    const minutes = Math.floor(totalSeconds / 60);
+                    const seconds = totalSeconds % 60;
+                    
+                    const mm = minutes.toString().padStart(2, '0');
+                    const ss = seconds.toString().padStart(2, '0');
+                    
+                    displayEl.textContent = `${mm}:${ss}`;
+                });
+            }, 1000);
         }
     });
 </script>
