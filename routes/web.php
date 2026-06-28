@@ -121,72 +121,64 @@ Route::middleware(['auth'])->group(function () {
             // 2. Helper: obtener equipo real por code
             $real = fn($code) => \App\Models\Team::where('code', $code)->firstOrFail();
 
-            // 3. Helper: crear/actualizar placeholder TBD
-            $tbd = fn($name, $code) => \App\Models\Team::updateOrCreate(
-                ['code' => $code],
-                ['name' => $name, 'group' => 'TBD']
-            );
+            // 3. Todos los equipos reales confirmados (FIFA 2026)
+            $sudafrica  = $real('za');      // South Africa
+            $canada     = $real('ca');      // Canada
+            $brasil     = $real('br');      // Brazil
+            $japon      = $real('jp');      // Japan
+            $alemania   = $real('de');      // Germany
+            $paraguay   = $real('py');      // Paraguay
+            $paises     = $real('nl');      // Netherlands
+            $marruecos  = $real('ma');      // Morocco
+            $marfil     = $real('ci');      // Cote d'Ivoire
+            $noruega    = $real('no');      // Norway
+            $francia    = $real('fr');      // France
+            $suecia     = $real('se');      // Sweden
+            $mexico     = $real('mx');      // Mexico
+            $ecuador    = $real('ec');      // Ecuador
+            $inglaterra = $real('gb-eng');  // England
+            $rdCongo    = $real('cd');      // DR Congo
+            $belgica    = $real('be');      // Belgium
+            $senegal    = $real('sn');      // Senegal
+            $usa        = $real('us');      // USA
+            $bosnia     = $real('ba');      // Bosnia and Herzegovina
+            $espana     = $real('es');      // Spain
+            $austria    = $real('at');      // Austria
+            $portugal   = $real('pt');      // Portugal
+            $croacia    = $real('hr');      // Croatia
+            $suiza      = $real('ch');      // Switzerland
+            $argelia    = $real('dz');      // Algeria
+            $australia  = $real('au');      // Australia
+            $egipto     = $real('eg');      // Egypt
+            $argentina  = $real('ar');      // Argentina
+            $caboVerde  = $real('cv');      // Cabo Verde
+            $colombia   = $real('co');      // Colombia
+            $ghana      = $real('gh');      // Ghana
 
-            // 4. Equipos reales confirmados
-            $sudafrica  = $real('za');   // Sudáfrica
-            $canada     = $real('ca');   // Canadá
-            $brasil     = $real('br');   // Brasil
-            $japon      = $real('jp');   // Japón
-            $alemania   = $real('de');   // Alemania
-            $paraguay   = $real('py');   // Paraguay
-            $paises     = $real('nl');   // Países Bajos
-            $marruecos  = $real('ma');   // Marruecos
-            $marfil     = $real('ci');   // Costa de Marfil
-            $noruega    = $real('no');   // Noruega
-            $francia    = $real('fr');   // Francia
-            $suecia     = $real('se');   // Suecia
-            $mexico     = $real('mx');   // México
-            $belgica    = $real('be');   // Bélgica
-            $usa        = $real('us');   // EE.UU.
-            $bosnia     = $real('ba');   // Bosnia y Herzegovina
-            $espana     = $real('es');   // España
-            $suiza      = $real('ch');   // Suiza
-            $australia  = $real('au');   // Australia
-            $egipto     = $real('eg');   // Egipto
-            $argentina  = $real('ar');   // Argentina
-            $caboVerde  = $real('cv');   // Cabo Verde
-
-            // 5. Placeholders para cruces aún TBD
-            $t3cefhi  = $tbd('3° C/E/F/H/I',  'tbd-3cefhi');
-            $t1L      = $tbd('1° Grupo L',     'tbd-1l');
-            $t3ehijk  = $tbd('3° E/H/I/J/K',  'tbd-3ehijk');
-            $t3aehij  = $tbd('3° A/E/H/I/J',  'tbd-3aehij');
-            $t2J      = $tbd('2° Grupo J',     'tbd-2j');
-            $t2K      = $tbd('2° Grupo K',     'tbd-2k');
-            $t2L      = $tbd('2° Grupo L',     'tbd-2l');
-            $t3efgij  = $tbd('3° E/F/G/I/J',  'tbd-3efgij');
-            $t1K      = $tbd('1° Grupo K',     'tbd-1k');
-            $t3deijl  = $tbd('3° D/E/I/J/L',  'tbd-3deijl');
-
-            // 6. Partidos R32 — Horario oficial Guatemala
+            // 4. Partidos R32 — Horario OFICIAL Guatemala (FIFA 2026)
             $matches = [
                 // Dom 28 jun
-                [$sudafrica, $canada,    '2026-06-28 13:00:00'],  // Sudáfrica vs Canadá
+                [$sudafrica,  $canada,     '2026-06-28 13:00:00'],  // South Africa vs Canada      1:00 PM
                 // Lun 29 jun
-                [$brasil,    $japon,     '2026-06-29 13:00:00'],  // Brasil vs Japón
-                [$alemania,  $paraguay,  '2026-06-29 14:30:00'],  // Alemania vs Paraguay
-                [$paises,    $marruecos, '2026-06-29 19:00:00'],  // Países Bajos vs Marruecos
+                [$brasil,     $japon,      '2026-06-29 11:00:00'],  // Brazil vs Japan             11:00 AM
+                [$alemania,   $paraguay,   '2026-06-29 14:30:00'],  // Germany vs Paraguay         2:30 PM
+                [$paises,     $marruecos,  '2026-06-29 19:00:00'],  // Netherlands vs Morocco      7:00 PM
                 // Mar 30 jun
-                [$marfil,    $noruega,   '2026-06-30 11:00:00'],  // Costa de Marfil vs Noruega
-                [$francia,   $suecia,    '2026-06-30 15:00:00'],  // Francia vs Suecia
-                [$mexico,    $t3cefhi,   '2026-06-30 19:00:00'],  // México vs 3°C/E/F/H/I
-                // Mié 1 jul
-                [$t1L,       $t3ehijk,   '2026-07-01 10:00:00'],  // 1°L vs 3°E/H/I/J/K
-                [$belgica,   $t3aehij,   '2026-07-01 14:00:00'],  // Bélgica vs 3°A/E/H/I/J
-                [$usa,       $bosnia,    '2026-07-01 18:00:00'],  // EE.UU. vs Bosnia y Herzegovina
+                [$marfil,     $noruega,    '2026-06-30 11:00:00'],  // Cote d'Ivoire vs Norway     11:00 AM
+                [$francia,    $suecia,     '2026-06-30 15:00:00'],  // France vs Sweden            3:00 PM
+                [$mexico,     $ecuador,    '2026-06-30 19:00:00'],  // Mexico vs Ecuador           7:00 PM
+                // Mie 1 jul
+                [$inglaterra, $rdCongo,    '2026-07-01 10:00:00'],  // England vs DR Congo         10:00 AM
+                [$belgica,    $senegal,    '2026-07-01 14:00:00'],  // Belgium vs Senegal          2:00 PM
+                [$usa,        $bosnia,     '2026-07-01 18:00:00'],  // USA vs Bosnia               6:00 PM
                 // Jue 2 jul
-                [$espana,    $t2J,       '2026-07-02 13:00:00'],  // España vs 2°J
-                [$t2K,       $t2L,       '2026-07-02 17:00:00'],  // 2°K vs 2°L
-                [$suiza,     $t3efgij,   '2026-07-02 21:00:00'],  // Suiza vs 3°E/F/G/I/J
+                [$espana,     $austria,    '2026-07-02 13:00:00'],  // Spain vs Austria            1:00 PM
+                [$portugal,   $croacia,    '2026-07-02 17:00:00'],  // Portugal vs Croatia         5:00 PM
+                [$suiza,      $argelia,    '2026-07-02 21:00:00'],  // Switzerland vs Algeria      9:00 PM
                 // Vie 3 jul
-                [$australia, $egipto,    '2026-07-03 12:00:00'],  // Australia vs Egipto
-                [$argentina, $caboVerde, '2026-07-03 16:00:00'],  // Argentina vs Cabo Verde
-                [$t1K,       $t3deijl,   '2026-07-03 19:30:00'],  // 1°K vs 3°D/E/I/J/L
+                [$australia,  $egipto,     '2026-07-03 12:00:00'],  // Australia vs Egypt          12:00 PM
+                [$argentina,  $caboVerde,  '2026-07-03 16:00:00'],  // Argentina vs Cabo Verde     4:00 PM
+                [$colombia,   $ghana,      '2026-07-03 19:30:00'],  // Colombia vs Ghana           7:30 PM
             ];
 
             foreach ($matches as $m) {
