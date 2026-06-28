@@ -57,12 +57,13 @@
                     <p style="color: var(--text-muted); margin-top: 0.5rem;">Los partidos del torneo aparecerán aquí pronto.</p>
                 </div>
             @else
-                    @php $inputIndex = 0; @endphp
                     @foreach($groupedGames as $stageName => $gamesList)
+                        @php $inputIndex = 0; @endphp
                         @php
                             $firstGame = $gamesList->first();
                             $stageKey  = $firstGame ? $firstGame->stage : 'group';
                             $isStageOpen = in_array($stageKey, $unlockedStages);
+                            $isGroupStage = ($stageKey === 'group');
                             // Determine the stage that must be completed before this one
                             $prevStageMap = [
                                 'r32'         => 'Fase de Grupos',
@@ -73,12 +74,36 @@
                                 'final'       => 'Semifinales',
                             ];
                             $prevStage = $prevStageMap[$stageKey] ?? null;
+                            $sectionId = 'stage-body-' . $stageKey . '-' . $loop->index;
+                            // Group stage: collapsed by default; knockout stages: always expanded
+                            $isCollapsed = $isGroupStage;
                         @endphp
-                        <div class="stage-section">
-                            {{-- Stage Header with unlock indicator (#9) --}}
-                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
-                                <h3 class="stage-title" style="margin-bottom: 0;">{{ $stageName }}</h3>
-                                @if($stageKey === 'group' || $isStageOpen)
+                        <div class="stage-section" style="margin-bottom: 1.5rem;">
+                            {{-- Stage Header: clickable for group stage --}}
+                            <div
+                                @if($isGroupStage) onclick="toggleStage('{{ $sectionId }}')"
+                                style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: {{ $isCollapsed ? '0' : '1rem' }}; cursor: pointer; user-select: none; padding: 0.85rem 1.1rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; transition: background 0.2s;"
+                                onmouseenter="this.style.background='rgba(255,255,255,0.06)'" onmouseleave="this.style.background='rgba(255,255,255,0.03)'"
+                                @else
+                                style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;"
+                                @endif
+                            >
+                                <h3 class="stage-title" style="margin-bottom: 0; flex: 1;">{{ $stageName }}</h3>
+
+                                @if($isGroupStage)
+                                    {{-- Finished games count badge for group stage --}}
+                                    @php
+                                        $finishedCount = $gamesList->where('status','finished')->count();
+                                        $totalCount    = $gamesList->count();
+                                    @endphp
+                                    <span style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600;">
+                                        {{ $finishedCount }}/{{ $totalCount }} finalizados
+                                    </span>
+                                    <span style="background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.3); padding: 0.2rem 0.65rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700;">
+                                        ✅ FINALIZADA
+                                    </span>
+                                    <span id="chevron-{{ $sectionId }}" style="color: var(--text-muted); font-size: 1rem; transition: transform 0.3s; transform: rotate(0deg); display: inline-block;">▼</span>
+                                @elseif($stageKey === 'group' || $isStageOpen)
                                     <span style="background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); padding: 0.2rem 0.65rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em;">
                                         🔓 ABIERTA
                                     </span>
@@ -89,6 +114,9 @@
                                 @endif
                             </div>
 
+                            {{-- Collapsible body --}}
+                            <div id="{{ $sectionId }}" style="{{ $isCollapsed ? 'display:none;' : '' }} margin-top: 1rem;">
+
                             {{-- Blocked stage explanation (#9) --}}
                             @if(!$isStageOpen && $stageKey !== 'group' && $prevStage)
                                 <div style="margin-bottom: 1.25rem; padding: 0.85rem 1.25rem; background: rgba(255,255,255,0.03); border: 1px dashed var(--border-glass); border-radius: 12px; display: flex; align-items: center; gap: 0.75rem; color: var(--text-muted); font-size: 0.9rem;">
@@ -96,7 +124,6 @@
                                     <span>Esta fase se desbloqueará cuando se completen todos los partidos de <strong style="color: white;">{{ $prevStage }}</strong>.</span>
                                 </div>
                             @endif
-
                             <div class="games-grid">
                                 @foreach($gamesList as $game)
                                     @php
@@ -263,8 +290,9 @@
                                         @php $inputIndex++; @endphp
                                     @endif
                                 @endforeach
-                            </div>
-                        </div>
+                            </div>{{-- /games-grid --}}
+                            </div>{{-- /collapsible body --}}
+                        </div>{{-- /stage-section --}}
                     @endforeach
 
             @endif
@@ -721,5 +749,21 @@
             }, 1000);
         }
     });
+
+    // ── Toggle colapsar/expandir secciones (Fase de Grupos) ──
+    function toggleStage(sectionId) {
+        const body    = document.getElementById(sectionId);
+        const chevron = document.getElementById('chevron-' + sectionId);
+        if (!body) return;
+
+        const isHidden = body.style.display === 'none' || body.style.display === '';
+        if (isHidden) {
+            body.style.display = 'block';
+            if (chevron) chevron.style.transform = 'rotate(180deg)';
+        } else {
+            body.style.display = 'none';
+            if (chevron) chevron.style.transform = 'rotate(0deg)';
+        }
+    }
 </script>
 @endsection
