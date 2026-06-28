@@ -269,7 +269,7 @@ class WorldCupSeeder extends Seeder
         foreach ($groupGames as $g) {
             $homeTeamId = $T[$g[0]]->id;
             $awayTeamId = $T[$g[1]]->id;
-            $matchDate  = Carbon::parse($g[2], 'America/Guatemala')->utc();
+            $matchDate  = Carbon::parse($g[2]);
 
             $exists = Game::where('home_team_id', $homeTeamId)
                           ->where('away_team_id', $awayTeamId)
@@ -291,41 +291,47 @@ class WorldCupSeeder extends Seeder
         // 5. Knockout Stage Games (32 total)
         // =====================================================================
 
-        // — Dieciseisavos (R32): 16 partidos — fuente oficial hora Guatemala
+        // — Dieciseisavos (R32): 16 partidos — hora Guatemala — fuente oficial FIFA 2026
+        // Los partidos del R32 siguen el bracket oficial:
+        // Dom 28 jun: Sudáfrica vs Canadá (13:00)
+        // Lun 29 jun: Brasil vs Japón (11:00), Alemania vs Paraguay (14:30), Países Bajos vs Marruecos (19:00)
+        // Mar 30 jun: Costa de Marfil vs Noruega (11:00), Francia vs Suecia (15:00), México vs Ecuador (19:00)
+        // Mié 1 jul: Inglaterra vs RD Congo (10:00), Bélgica vs Senegal (14:00), EE.UU. vs Bosnia (18:00)
+        // Jue 2 jul: España vs Austria (13:00), Portugal vs Croacia (17:00), Suiza vs Argelia (21:00)
+        // Vie 3 jul: Australia vs Egipto (12:00), Argentina vs Cabo Verde (16:00), Colombia vs Ghana (19:30)
         $r32GameData = [
             // Dom 28 jun
-            [$r32Teams[0],  $r32Teams[3],  '2026-06-28 13:00:00'],  // Llave 3:  2°A vs 2°B
+            [$r32Teams[0],  $r32Teams[3],  '2026-06-28 13:00:00'],  // Sudáfrica vs Canadá
             // Lun 29 jun
-            [$r32Teams[4],  $r32Teams[7],  '2026-06-29 11:00:00'],  // Llave 9:  1°C vs 2°F
-            [$r32Teams[8],  $r32Teams[11], '2026-06-29 14:30:00'],  // Llave 1:  1°E vs 3°(A-B-C-D-F)
-            [$r32Teams[12], $r32Teams[15], '2026-06-29 19:00:00'],  // Llave 4:  1°F vs 2°C
+            [$r32Teams[4],  $r32Teams[7],  '2026-06-29 11:00:00'],  // Brasil vs Japón
+            [$r32Teams[8],  $r32Teams[11], '2026-06-29 14:30:00'],  // Alemania vs Paraguay
+            [$r32Teams[12], $r32Teams[15], '2026-06-29 19:00:00'],  // Países Bajos vs Marruecos
             // Mar 30 jun
-            [$r32Teams[16], $r32Teams[19], '2026-06-30 11:00:00'],  // Llave 10: 2°E vs 2°I
-            [$r32Teams[20], $r32Teams[23], '2026-06-30 15:00:00'],  // Llave 2:  1°I vs 3°(C-D-F-G-H)
-            [$r32Teams[1],  $r32Teams[2],  '2026-06-30 19:00:00'],  // Llave 11: 1°A vs 3°(C-E-F-H-I)
+            [$r32Teams[16], $r32Teams[19], '2026-06-30 11:00:00'],  // Costa de Marfil vs Noruega
+            [$r32Teams[20], $r32Teams[23], '2026-06-30 15:00:00'],  // Francia vs Suecia
+            [$r32Teams[1],  $r32Teams[2],  '2026-06-30 19:00:00'],  // México vs Ecuador
             // Mié 1 jul
-            [$r32Teams[5],  $r32Teams[6],  '2026-07-01 10:00:00'],  // Llave 12: 1°L vs 3°(E-H-I-J-K)
-            [$r32Teams[9],  $r32Teams[10], '2026-07-01 14:00:00'],  // Llave 8:  1°G vs 3°(A-E-H-I-J)
-            [$r32Teams[13], $r32Teams[14], '2026-07-01 18:00:00'],  // Llave 7:  1°D vs 3°(B-E-F-I-J)
+            [$r32Teams[5],  $r32Teams[6],  '2026-07-01 10:00:00'],  // Inglaterra vs RD Congo
+            [$r32Teams[9],  $r32Teams[10], '2026-07-01 14:00:00'],  // Bélgica vs Senegal
+            [$r32Teams[13], $r32Teams[14], '2026-07-01 18:00:00'],  // EE.UU. vs Bosnia y Herzegovina
             // Jue 2 jul
-            [$r32Teams[17], $r32Teams[18], '2026-07-02 13:00:00'],  // Llave 6:  1°H vs 2°J
-            [$r32Teams[21], $r32Teams[22], '2026-07-02 17:00:00'],  // Llave 5:  2°K vs 2°L
-            [$r32Teams[24], $r32Teams[25], '2026-07-02 21:00:00'],  // Llave 15: 1°B vs 3°(E-F-G-I-J)
+            [$r32Teams[17], $r32Teams[18], '2026-07-02 13:00:00'],  // España vs Austria
+            [$r32Teams[21], $r32Teams[22], '2026-07-02 17:00:00'],  // Portugal vs Croacia
+            [$r32Teams[24], $r32Teams[25], '2026-07-02 21:00:00'],  // Suiza vs Argelia
             // Vie 3 jul
-            [$r32Teams[26], $r32Teams[27], '2026-07-03 12:00:00'],  // Llave 14: 2°D vs 2°G
-            [$r32Teams[28], $r32Teams[29], '2026-07-03 16:00:00'],  // Llave 13: 1°J vs 2°H
-            [$r32Teams[30], $r32Teams[31], '2026-07-03 19:30:00'],  // Llave 16: 1°K vs 3°(D-E-I-J-L)
+            [$r32Teams[26], $r32Teams[27], '2026-07-03 12:00:00'],  // Australia vs Egipto
+            [$r32Teams[28], $r32Teams[29], '2026-07-03 16:00:00'],  // Argentina vs Cabo Verde
+            [$r32Teams[30], $r32Teams[31], '2026-07-03 19:30:00'],  // Colombia vs Ghana
         ];
         foreach ($r32GameData as $g) {
             $exists = Game::where('home_team_id', $g[0]->id)
                           ->where('away_team_id', $g[1]->id)
-                          ->where('match_date', Carbon::parse($g[2], 'America/Guatemala')->utc())
                           ->exists();
             if (!$exists) {
                 Game::create([
                     'home_team_id' => $g[0]->id,
                     'away_team_id' => $g[1]->id,
-                    'match_date'   => Carbon::parse($g[2], 'America/Guatemala')->utc(),
+                    'match_date'   => Carbon::parse($g[2]),
                     'stage'        => 'r32',
                     'status'       => 'pending',
                 ]);
@@ -350,13 +356,13 @@ class WorldCupSeeder extends Seeder
         foreach ($r16GameData as $g) {
             $exists = Game::where('home_team_id', $g[0]->id)
                           ->where('away_team_id', $g[1]->id)
-                          ->where('match_date', Carbon::parse($g[2], 'America/Guatemala')->utc())
+                          ->where('match_date', Carbon::parse($g[2]))
                           ->exists();
             if (!$exists) {
                 Game::create([
                     'home_team_id' => $g[0]->id,
                     'away_team_id' => $g[1]->id,
-                    'match_date'   => Carbon::parse($g[2], 'America/Guatemala')->utc(),
+                    'match_date'   => Carbon::parse($g[2]),
                     'stage'        => 'r16',
                     'status'       => 'pending',
                 ]);
@@ -373,13 +379,13 @@ class WorldCupSeeder extends Seeder
         foreach ($qfGameData as $g) {
             $exists = Game::where('home_team_id', $g[0]->id)
                           ->where('away_team_id', $g[1]->id)
-                          ->where('match_date', Carbon::parse($g[2], 'America/Guatemala')->utc())
+                          ->where('match_date', Carbon::parse($g[2]))
                           ->exists();
             if (!$exists) {
                 Game::create([
                     'home_team_id' => $g[0]->id,
                     'away_team_id' => $g[1]->id,
-                    'match_date'   => Carbon::parse($g[2], 'America/Guatemala')->utc(),
+                    'match_date'   => Carbon::parse($g[2]),
                     'stage'        => 'quarter',
                     'status'       => 'pending',
                 ]);
@@ -394,13 +400,13 @@ class WorldCupSeeder extends Seeder
         foreach ($sfGameData as $g) {
             $exists = Game::where('home_team_id', $g[0]->id)
                           ->where('away_team_id', $g[1]->id)
-                          ->where('match_date', Carbon::parse($g[2], 'America/Guatemala')->utc())
+                          ->where('match_date', Carbon::parse($g[2]))
                           ->exists();
             if (!$exists) {
                 Game::create([
                     'home_team_id' => $g[0]->id,
                     'away_team_id' => $g[1]->id,
-                    'match_date'   => Carbon::parse($g[2], 'America/Guatemala')->utc(),
+                    'match_date'   => Carbon::parse($g[2]),
                     'stage'        => 'semi',
                     'status'       => 'pending',
                 ]);
@@ -410,13 +416,13 @@ class WorldCupSeeder extends Seeder
         // — Tercer Lugar: 1 partido — Sáb 18 jul 15:00 GT
         $thirdExists = Game::where('home_team_id', $thirdHome->id)
                            ->where('away_team_id', $thirdAway->id)
-                           ->where('match_date', Carbon::parse('2026-07-18 15:00:00', 'America/Guatemala')->utc())
+                           ->where('match_date', Carbon::parse('2026-07-18 15:00:00'))
                            ->exists();
         if (!$thirdExists) {
             Game::create([
                 'home_team_id' => $thirdHome->id,
                 'away_team_id' => $thirdAway->id,
-                'match_date'   => Carbon::parse('2026-07-18 15:00:00', 'America/Guatemala')->utc(),
+                'match_date'   => Carbon::parse('2026-07-18 15:00:00'),
                 'stage'        => 'third_place',
                 'status'       => 'pending',
             ]);
@@ -425,13 +431,13 @@ class WorldCupSeeder extends Seeder
         // — Final: 1 partido — Dom 19 jul 13:00 GT
         $finalExists = Game::where('home_team_id', $finalHome->id)
                            ->where('away_team_id', $finalAway->id)
-                           ->where('match_date', Carbon::parse('2026-07-19 13:00:00', 'America/Guatemala')->utc())
+                           ->where('match_date', Carbon::parse('2026-07-19 13:00:00'))
                            ->exists();
         if (!$finalExists) {
             Game::create([
                 'home_team_id' => $finalHome->id,
                 'away_team_id' => $finalAway->id,
-                'match_date'   => Carbon::parse('2026-07-19 13:00:00', 'America/Guatemala')->utc(),
+                'match_date'   => Carbon::parse('2026-07-19 13:00:00'),
                 'stage'        => 'final',
                 'status'       => 'pending',
             ]);
