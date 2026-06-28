@@ -17,8 +17,10 @@ export LOG_CHANNEL=$(printf '%s' "${LOG_CHANNEL}" | tr -d '\r')
 echo "==> Running database migrations..."
 php artisan migrate --force
 
-echo "==> Running seeders..."
-php artisan db:seed --class=WorldCupSeeder --force
+echo "==> Clearing caches (routes, config, views)..."
+php artisan route:clear
+php artisan config:clear
+php artisan view:clear
 
 echo "==> Starting Apache..."
 exec apache2-foreground
