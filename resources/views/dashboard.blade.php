@@ -62,6 +62,9 @@
                         @php
                             $firstGame = $gamesList->first();
                             $stageKey  = $firstGame ? $firstGame->stage : 'group';
+
+                            // ── OCULTAR FASE DE GRUPOS: ya finalizada, se esconde del dashboard ──
+                            if ($stageKey === 'group') continue;
                             $isStageOpen = in_array($stageKey, $unlockedStages);
                             $isGroupStage = ($stageKey === 'group');
                             // Determine the stage that must be completed before this one
