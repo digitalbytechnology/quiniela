@@ -45,24 +45,25 @@ class Game extends Model
 
         foreach ($stagesOrder as $stage) {
             $gamesExist = self::where('stage', $stage)->exists();
-            if ($gamesExist) {
-                $hasUnfinished = self::where('stage', $stage)->where('status', '!=', 'finished')->exists();
-                if (!$hasUnfinished) {
-                    if ($stage === 'group') {
-                        $unlocked[] = 'r32';
-                    } elseif ($stage === 'r32') {
-                        $unlocked[] = 'r16';
-                    } elseif ($stage === 'r16') {
-                        $unlocked[] = 'quarter';
-                    } elseif ($stage === 'quarter') {
-                        $unlocked[] = 'semi';
-                    } elseif ($stage === 'semi') {
-                        $unlocked[] = 'third_place';
-                        $unlocked[] = 'final';
-                    }
-                } else {
-                    break;
+            $hasUnfinished = $gamesExist ? self::where('stage', $stage)->where('status', '!=', 'finished')->exists() : false;
+
+            // Si la fase no existe (ej. se borró la fase de grupos) o ya está finalizada, desbloqueamos la siguiente
+            if (!$gamesExist || !$hasUnfinished) {
+                if ($stage === 'group') {
+                    $unlocked[] = 'r32';
+                } elseif ($stage === 'r32') {
+                    $unlocked[] = 'r16';
+                } elseif ($stage === 'r16') {
+                    $unlocked[] = 'quarter';
+                } elseif ($stage === 'quarter') {
+                    $unlocked[] = 'semi';
+                } elseif ($stage === 'semi') {
+                    $unlocked[] = 'third_place';
+                    $unlocked[] = 'final';
                 }
+            } else {
+                // Si la fase actual existe y tiene partidos pendientes, no desbloqueamos las siguientes
+                break;
             }
         }
 
