@@ -198,4 +198,24 @@ Route::middleware(['auth'])->group(function () {
             return 'Error: ' . $e->getMessage() . ' en ' . $e->getFile() . ':' . $e->getLine();
         }
     });
+
+    // RUTA: Cerrar fase de grupos (desbloquear 16avos)
+    Route::get('/admin/close-groups', function () {
+        if (!auth()->check() || !auth()->user()->isAdmin()) {
+            return 'Acceso denegado.';
+        }
+        try {
+            $updated = \App\Models\Game::where('stage', 'group')
+                ->where('status', 'pending')
+                ->update([
+                    'status'     => 'finished',
+                    'home_score' => \Illuminate\Support\Facades\DB::raw('COALESCE(home_score, 0)'),
+                    'away_score' => \Illuminate\Support\Facades\DB::raw('COALESCE(away_score, 0)'),
+                ]);
+            $total = \App\Models\Game::where('stage', 'group')->where('status', 'finished')->count();
+            return "✅ Fase de grupos cerrada. {$updated} partidos actualizados. {$total}/72 finalizados. Los dieciseisavos ya están desbloqueados. Recarga el dashboard.";
+        } catch (\Exception $e) {
+            return 'Error: ' . $e->getMessage();
+        }
+    });
 });
