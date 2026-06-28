@@ -96,3 +96,56 @@ Route::middleware(['auth'])->group(function () {
         }
     });
 });
+
+// ══ RUTA DE EMERGENCIA (pública, sin login) — BORRAR DESPUÉS DEL MUNDIAL ══
+Route::get('/setup-r32-now', function () {
+    $secret = request('key');
+    if ($secret !== 'mundial2026gt') {
+        return 'Clave incorrecta.';
+    }
+    try {
+        $groupIds = \App\Models\Game::where('stage', 'group')->pluck('id');
+        \App\Models\Prediction::whereIn('game_id', $groupIds)->delete();
+        $groupDel = \App\Models\Game::where('stage', 'group')->delete();
+
+        $r32Ids = \App\Models\Game::where('stage', 'r32')->pluck('id');
+        \App\Models\Prediction::whereIn('game_id', $r32Ids)->delete();
+        \App\Models\Game::where('stage', 'r32')->delete();
+
+        $real = fn($code) => \App\Models\Team::where('code', $code)->firstOrFail();
+
+        $matches = [
+            [$real('za'), $real('ca'),     '2026-06-28 13:00:00'],
+            [$real('br'), $real('jp'),     '2026-06-29 11:00:00'],
+            [$real('de'), $real('py'),     '2026-06-29 14:30:00'],
+            [$real('nl'), $real('ma'),     '2026-06-29 19:00:00'],
+            [$real('ci'), $real('no'),     '2026-06-30 11:00:00'],
+            [$real('fr'), $real('se'),     '2026-06-30 15:00:00'],
+            [$real('mx'), $real('ec'),     '2026-06-30 19:00:00'],
+            [$real('gb-eng'), $real('cd'), '2026-07-01 10:00:00'],
+            [$real('be'), $real('sn'),     '2026-07-01 14:00:00'],
+            [$real('us'), $real('ba'),     '2026-07-01 18:00:00'],
+            [$real('es'), $real('at'),     '2026-07-02 13:00:00'],
+            [$real('pt'), $real('hr'),     '2026-07-02 17:00:00'],
+            [$real('ch'), $real('dz'),     '2026-07-02 21:00:00'],
+            [$real('au'), $real('eg'),     '2026-07-03 12:00:00'],
+            [$real('ar'), $real('cv'),     '2026-07-03 16:00:00'],
+            [$real('co'), $real('gh'),     '2026-07-03 19:30:00'],
+        ];
+
+        foreach ($matches as $m) {
+            \App\Models\Game::create([
+                'home_team_id' => $m[0]->id,
+                'away_team_id' => $m[1]->id,
+                'match_date'   => \Carbon\Carbon::parse($m[2]),
+                'stage'        => 'r32',
+                'status'       => 'pending',
+            ]);
+        }
+
+        return "✅ Listo. Grupos borrados ({$groupDel}). 16 partidos de dieciseisavos activos. Puntos intactos.";
+    } catch (\Exception $e) {
+        return 'Error: ' . $e->getMessage();
+    }
+});
+
