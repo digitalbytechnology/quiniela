@@ -63,4 +63,49 @@ Route::middleware(['auth'])->group(function () {
             return 'Error al limpiar base de datos: ' . $e->getMessage();
         }
     });
+
+    // RUTA PARA ELIMINAR DUPLICADOS SIN BORRAR TODO
+    Route::get('/admin/limpiar-duplicados', function () {
+        if (!auth()->check() || !auth()->user()->isAdmin()) {
+            return 'Acceso denegado.';
+        }
+
+        try {
+            $games = \App\Models\Game::orderBy('id', 'asc')->get();
+
+            // Agrupar por home_team_id + away_team_id
+            $grouped = $games->groupBy(fn($g) => $g->home_team_id . '-' . $g->away_team_id);
+
+            $deleted = 0;
+            foreach ($grouped as $key => $duplicates) {
+                if ($duplicates->count() <= 1) continue;
+
+                // Conservar el que tiene resultados (finished) o el de menor ID
+                $sorted = $duplicates->sortByDesc(fn($g) => $g->status === 'finished' ? 1 : 0)->values();
+
+                $toKeep = $sorted->first();
+                foreach ($sorted->slice(1) as $dup) {
+                    // Reasignar predicciones al juego que conservamos si no hay conflicto
+                    \App\Models\Prediction::where('game_id', $dup->id)
+                        ->whereNotExists(function ($q) use ($toKeep) {
+                            $q->from('predictions as p2')
+                              ->whereColumn('p2.user_id', 'predictions.user_id')
+                              ->where('p2.game_id', $toKeep->id);
+                        })
+                        ->update(['game_id' => $toKeep->id]);
+
+                    // Borrar predicciones huérfanas del duplicado
+                    \App\Models\Prediction::where('game_id', $dup->id)->delete();
+
+                    // Borrar el partido duplicado
+                    $dup->delete();
+                    $deleted++;
+                }
+            }
+
+            return "✅ Limpieza completada. Se eliminaron {$deleted} partido(s) duplicado(s). Recarga el dashboard.";
+        } catch (\Exception $e) {
+            return 'Error: ' . $e->getMessage();
+        }
+    });
 });
