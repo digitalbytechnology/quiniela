@@ -269,7 +269,7 @@ class WorldCupSeeder extends Seeder
         foreach ($groupGames as $g) {
             $homeTeamId = $T[$g[0]]->id;
             $awayTeamId = $T[$g[1]]->id;
-            $matchDate  = Carbon::parse($g[2]);
+            $matchDate  = Carbon::parse($g[2], 'America/Guatemala')->utc();
 
             $exists = Game::where('home_team_id', $homeTeamId)
                           ->where('away_team_id', $awayTeamId)
@@ -319,13 +319,13 @@ class WorldCupSeeder extends Seeder
         foreach ($r32GameData as $g) {
             $exists = Game::where('home_team_id', $g[0]->id)
                           ->where('away_team_id', $g[1]->id)
-                          ->where('match_date', Carbon::parse($g[2]))
+                          ->where('match_date', Carbon::parse($g[2], 'America/Guatemala')->utc())
                           ->exists();
             if (!$exists) {
                 Game::create([
                     'home_team_id' => $g[0]->id,
                     'away_team_id' => $g[1]->id,
-                    'match_date'   => Carbon::parse($g[2]),
+                    'match_date'   => Carbon::parse($g[2], 'America/Guatemala')->utc(),
                     'stage'        => 'r32',
                     'status'       => 'pending',
                 ]);
@@ -350,13 +350,13 @@ class WorldCupSeeder extends Seeder
         foreach ($r16GameData as $g) {
             $exists = Game::where('home_team_id', $g[0]->id)
                           ->where('away_team_id', $g[1]->id)
-                          ->where('match_date', Carbon::parse($g[2]))
+                          ->where('match_date', Carbon::parse($g[2], 'America/Guatemala')->utc())
                           ->exists();
             if (!$exists) {
                 Game::create([
                     'home_team_id' => $g[0]->id,
                     'away_team_id' => $g[1]->id,
-                    'match_date'   => Carbon::parse($g[2]),
+                    'match_date'   => Carbon::parse($g[2], 'America/Guatemala')->utc(),
                     'stage'        => 'r16',
                     'status'       => 'pending',
                 ]);
@@ -373,13 +373,13 @@ class WorldCupSeeder extends Seeder
         foreach ($qfGameData as $g) {
             $exists = Game::where('home_team_id', $g[0]->id)
                           ->where('away_team_id', $g[1]->id)
-                          ->where('match_date', Carbon::parse($g[2]))
+                          ->where('match_date', Carbon::parse($g[2], 'America/Guatemala')->utc())
                           ->exists();
             if (!$exists) {
                 Game::create([
                     'home_team_id' => $g[0]->id,
                     'away_team_id' => $g[1]->id,
-                    'match_date'   => Carbon::parse($g[2]),
+                    'match_date'   => Carbon::parse($g[2], 'America/Guatemala')->utc(),
                     'stage'        => 'quarter',
                     'status'       => 'pending',
                 ]);
@@ -394,13 +394,13 @@ class WorldCupSeeder extends Seeder
         foreach ($sfGameData as $g) {
             $exists = Game::where('home_team_id', $g[0]->id)
                           ->where('away_team_id', $g[1]->id)
-                          ->where('match_date', Carbon::parse($g[2]))
+                          ->where('match_date', Carbon::parse($g[2], 'America/Guatemala')->utc())
                           ->exists();
             if (!$exists) {
                 Game::create([
                     'home_team_id' => $g[0]->id,
                     'away_team_id' => $g[1]->id,
-                    'match_date'   => Carbon::parse($g[2]),
+                    'match_date'   => Carbon::parse($g[2], 'America/Guatemala')->utc(),
                     'stage'        => 'semi',
                     'status'       => 'pending',
                 ]);
@@ -410,13 +410,13 @@ class WorldCupSeeder extends Seeder
         // — Tercer Lugar: 1 partido — Sáb 18 jul 15:00 GT
         $thirdExists = Game::where('home_team_id', $thirdHome->id)
                            ->where('away_team_id', $thirdAway->id)
-                           ->where('match_date', Carbon::parse('2026-07-18 15:00:00'))
+                           ->where('match_date', Carbon::parse('2026-07-18 15:00:00', 'America/Guatemala')->utc())
                            ->exists();
         if (!$thirdExists) {
             Game::create([
                 'home_team_id' => $thirdHome->id,
                 'away_team_id' => $thirdAway->id,
-                'match_date'   => Carbon::parse('2026-07-18 15:00:00'),
+                'match_date'   => Carbon::parse('2026-07-18 15:00:00', 'America/Guatemala')->utc(),
                 'stage'        => 'third_place',
                 'status'       => 'pending',
             ]);
@@ -425,13 +425,13 @@ class WorldCupSeeder extends Seeder
         // — Final: 1 partido — Dom 19 jul 13:00 GT
         $finalExists = Game::where('home_team_id', $finalHome->id)
                            ->where('away_team_id', $finalAway->id)
-                           ->where('match_date', Carbon::parse('2026-07-19 13:00:00'))
+                           ->where('match_date', Carbon::parse('2026-07-19 13:00:00', 'America/Guatemala')->utc())
                            ->exists();
         if (!$finalExists) {
             Game::create([
                 'home_team_id' => $finalHome->id,
                 'away_team_id' => $finalAway->id,
-                'match_date'   => Carbon::parse('2026-07-19 13:00:00'),
+                'match_date'   => Carbon::parse('2026-07-19 13:00:00', 'America/Guatemala')->utc(),
                 'stage'        => 'final',
                 'status'       => 'pending',
             ]);

@@ -102,7 +102,12 @@
                                     @php
                                         $prediction = $predictions->get($game->id);
                                         $isStageUnlocked = in_array($game->stage, $unlockedStages);
-                                        $hasStarted = $game->match_date->isBefore(now());
+                                        
+                                        // Always work in Guatemala timezone
+                                        $matchDateGT = $game->match_date->setTimezone('America/Guatemala');
+                                        $nowGT = now()->setTimezone('America/Guatemala');
+                                        
+                                        $hasStarted = $matchDateGT->isPast();
                                         $isFinished = $game->status === 'finished';
                                         $canPredict = $isStageUnlocked && !$hasStarted && !$isFinished;
 
@@ -112,8 +117,23 @@
                                         $isAwayPlaceholder = ($awayTeam->group === 'TBD');
 
                                         // Countdown urgency: < 3h → warning color
-                                        $minutesLeft = now()->diffInMinutes($game->match_date, false);
+                                        $minutesLeft = $nowGT->diffInMinutes($matchDateGT, false);
                                         $isUrgent = !$hasStarted && $minutesLeft <= 180 && $minutesLeft > 0;
+                                        
+                                        // Format date label: Hoy / Mañana / Día semana
+                                        $todayGT    = $nowGT->copy()->startOfDay();
+                                        $matchDayGT = $matchDateGT->copy()->startOfDay();
+                                        $diffDays   = $todayGT->diffInDays($matchDayGT, false);
+                                        if ($diffDays == 0) {
+                                            $dayLabel = 'Hoy';
+                                        } elseif ($diffDays == 1) {
+                                            $dayLabel = 'Mañana';
+                                        } else {
+                                            $dayNames = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+                                            $monthNames = ['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+                                            $dayLabel = $dayNames[$matchDateGT->dayOfWeek] . ', ' . $monthNames[(int)$matchDateGT->format('n')] . ' ' . $matchDateGT->format('j');
+                                        }
+                                        $timeLabel = $matchDateGT->format('g:i A'); // e.g. 1:00 PM
                                     @endphp
                                     
                                     @if($canPredict)
@@ -126,10 +146,10 @@
                                         
                                         <div class="game-header">
                                             <div class="game-date" style="display: flex; flex-direction: column; align-items: flex-start; gap: 0.15rem;">
-                                                <span>📅 {{ $game->match_date->format('d/m/Y H:i') }}</span>
+                                                <span>📅 {{ $dayLabel }} · {{ $timeLabel }}</span>
                                                 @if($isUrgent)
                                                     @if($minutesLeft <= 60)
-                                                        <span class="countdown-timer" data-deadline="{{ $game->match_date->toIso8601String() }}" style="font-size: 0.75rem; color: #f59e0b; font-weight: 700; animation: pulse 1.5s infinite;">
+                                                        <span class="countdown-timer" data-deadline="{{ $matchDateGT->toIso8601String() }}" style="font-size: 0.75rem; color: #f59e0b; font-weight: 700; animation: pulse 1.5s infinite;">
                                                             ⚡ ¡Cierra en <span class="timer-display">Cargando...</span>!
                                                         </span>
                                                     @else
@@ -139,7 +159,7 @@
                                                     @endif
                                                 @elseif(!$hasStarted && !$isFinished)
                                                     <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">
-                                                        ⏰ Límite: {{ $game->match_date->format('H:i') }}
+                                                        ⏰ Límite: {{ $timeLabel }}
                                                     </span>
                                                 @endif
                                             </div>
