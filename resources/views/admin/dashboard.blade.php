@@ -50,10 +50,10 @@
             </select>
         </div>
         <button type="submit" class="btn btn-primary" style="white-space: nowrap; background: linear-gradient(135deg, #d97706, #facc15); border: none; color: #1a1a2e;">
-            🏆 {{ $worldChampion ? 'Actualizar Campeón' : 'Declarar Campeón (+50 pts)' }}
+            🏆 {{ $worldChampion ? 'Actualizar Campeón' : 'Declarar Campeón (+20 pts)' }}
         </button>
     </form>
-    <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.75rem;">Al declarar al campeón, se otorgarán automáticamente <strong style="color: #facc15;">50 puntos</strong> a todos los participantes que lo hayan seleccionado.</p>
+    <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.75rem;">Al declarar al campeón, se otorgarán automáticamente <strong style="color: #facc15;">20 puntos</strong> a todos los participantes que lo hayan seleccionado.</p>
 </div>
 
 {{-- Success print alert --}}

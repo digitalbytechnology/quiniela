@@ -362,7 +362,7 @@ class QuinielaController extends Controller
                 $predPoints = Prediction::where('user_id', $u->id)
                     ->whereNotNull('points_earned')
                     ->sum('points_earned');
-                $championBonus = $u->champion_points_awarded ? 50 : 0;
+                $championBonus = $u->champion_points_awarded ? 20 : 0;
                 $u->points = $predPoints + $championBonus + $u->extra_points;
                 $u->save();
             }
@@ -471,7 +471,7 @@ class QuinielaController extends Controller
                     ->sum('points_earned');
 
                 // Add champion bonus if already awarded
-                $championBonus = $u->champion_points_awarded ? 50 : 0;
+                $championBonus = $u->champion_points_awarded ? 20 : 0;
                 $u->points     = $predPoints + $championBonus + $u->extra_points;
                 $u->save();
             }
@@ -497,20 +497,20 @@ class QuinielaController extends Controller
         // Save champion to settings
         Setting::setValue('world_cup_champion', $championId);
 
-        // Award 50 points to users who picked correctly (only once)
+        // Award 20 points to users who picked correctly (only once)
         $winners = User::where('champion_pick_team_id', $championId)
                        ->where('champion_points_awarded', false)
                        ->get();
 
         foreach ($winners as $u) {
-            $u->points += 50;
+            $u->points += 20;
             $u->champion_points_awarded = true;
             $u->save();
         }
 
         $team = Team::find($championId);
         $count = $winners->count();
-        return back()->with('success', "🏆 Campeón declarado: {$team->name}. Se otorgaron 50 pts a {$count} participante(s).");
+        return back()->with('success', "🏆 Campeón declarado: {$team->name}. Se otorgaron 20 pts a {$count} participante(s).");
     }
 
     // ==========================================
@@ -667,7 +667,7 @@ class QuinielaController extends Controller
         $predPoints = Prediction::where('user_id', $user->id)
             ->whereNotNull('points_earned')
             ->sum('points_earned');
-        $championBonus = $user->champion_points_awarded ? 50 : 0;
+        $championBonus = $user->champion_points_awarded ? 20 : 0;
         $user->points = $predPoints + $championBonus + $user->extra_points;
 
         $user->save();

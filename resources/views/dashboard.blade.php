@@ -453,7 +453,7 @@
                     <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.95rem;">
                         Selecciona al campeón antes del inicio del torneo
                         <strong style="color: white;">({{ $championDeadline->format('d M · H:i') }})</strong>.
-                        <br>Si aciertas, <strong style="color: #facc15;">ganas 50 puntos</strong>.
+                        <br>Si aciertas, <strong style="color: #facc15;">ganas 20 puntos</strong>.
                     </p>
                 </div>
 
@@ -476,7 +476,7 @@
                         </div>
                         @if($worldChampion)
                             @if($worldChampionId == $userChampionPick->id)
-                                <span style="margin-left: auto; background: rgba(16,185,129,0.15); color: #10b981; padding: 0.35rem 0.85rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700;">✅ +50 pts</span>
+                                <span style="margin-left: auto; background: rgba(16,185,129,0.15); color: #10b981; padding: 0.35rem 0.85rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700;">✅ +20 pts</span>
                             @else
                                 <span style="margin-left: auto; background: rgba(239,68,68,0.1); color: var(--danger); padding: 0.35rem 0.85rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700;">❌ 0 pts</span>
                             @endif
@@ -529,10 +529,10 @@
 
                 <div class="rules-list">
                     <div class="rules-item">
-                        <div class="rule-number" style="background: linear-gradient(135deg, #facc15, #f59e0b); box-shadow: 0 4px 10px rgba(250,204,21,0.35); font-size: 1rem;">+50</div>
+                        <div class="rule-number" style="background: linear-gradient(135deg, #facc15, #f59e0b); box-shadow: 0 4px 10px rgba(250,204,21,0.35); font-size: 1rem;">+20</div>
                         <div class="rule-content">
-                            <h4>🏆 Campeón del Mundial (50 Puntos)</h4>
-                            <p>Acertar el equipo que se coronará Campeón del Mundo FIFA 2026. La selección se registra <strong>antes del inicio del torneo</strong> ({{ $championDeadline->format('d M · H:i') }} h). Solo se puede elegir un equipo por participante. Si aciertas, recibes automáticamente <strong>+50 puntos</strong>.</p>
+                            <h4>🏆 Campeón del Mundial (20 Puntos)</h4>
+                            <p>Acertar el equipo que se coronará Campeón del Mundo FIFA 2026. La selección se registra <strong>antes del inicio del torneo</strong> ({{ $championDeadline->format('d M · H:i') }} h). Solo se puede elegir un equipo por participante. Si aciertas, recibes automáticamente <strong>+20 puntos</strong>.</p>
                         </div>
                     </div>
 

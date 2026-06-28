@@ -42,7 +42,7 @@
                 @foreach($users as $user)
                     @php
                         $predPoints = \App\Models\Prediction::where('user_id', $user->id)->whereNotNull('points_earned')->sum('points_earned');
-                        $championPoints = $user->champion_points_awarded ? 50 : 0;
+                        $championPoints = $user->champion_points_awarded ? 20 : 0;
                     @endphp
                     <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
                         <td style="padding: 1rem;">
