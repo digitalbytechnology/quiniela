@@ -255,9 +255,9 @@ class QuinielaController extends Controller
         $worldChampionId = Setting::getValue('world_cup_champion');
         $worldChampion   = $worldChampionId ? Team::find($worldChampionId) : null;
 
-        // Predictions for live games (started but not finished) — admin can see all users' picks
+        // Predictions for live games (or soon to start <= 65 mins) — admin can see all users' picks
         $liveGameIds = $games->filter(function ($game) {
-            return $game->match_date->isBefore(now()) && $game->status !== 'finished';
+            return $game->match_date->copy()->subMinutes(65)->isBefore(now()) && $game->status !== 'finished';
         })->pluck('id');
 
         $livePredictions = [];

@@ -234,9 +234,9 @@
                             </div>
                         </form>
 
-                        {{-- Show all users' predictions for live games --}}
+                        {{-- Show all users' predictions for live games or games starting in <= 65 mins --}}
                         @php
-                            $isLive = $game->match_date->isBefore(now()) && !$isFinished;
+                            $isLive = $game->match_date->copy()->subMinutes(65)->isBefore(now()) && !$isFinished;
                             $gamePredictions = $isLive && isset($livePredictions[$game->id]) ? $livePredictions[$game->id] : collect();
                         @endphp
                         @if($isLive && $gamePredictions->isNotEmpty())
