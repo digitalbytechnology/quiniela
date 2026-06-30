@@ -268,7 +268,17 @@ class QuinielaController extends Controller
                 ->groupBy('game_id');
         }
 
-        return view('admin.dashboard', compact('groupedGames', 'realTeams', 'worldChampion', 'worldChampionId', 'livePredictions'));
+        // Predictions for finished games — admin can reveal them on demand
+        $finishedGameIds = $games->where('status', 'finished')->pluck('id');
+        $finishedPredictions = [];
+        if ($finishedGameIds->isNotEmpty()) {
+            $finishedPredictions = Prediction::whereIn('game_id', $finishedGameIds)
+                ->with('user')
+                ->get()
+                ->groupBy('game_id');
+        }
+
+        return view('admin.dashboard', compact('groupedGames', 'realTeams', 'worldChampion', 'worldChampionId', 'livePredictions', 'finishedPredictions'));
     }
 
     public function bulkUpdateGames(Request $request)
