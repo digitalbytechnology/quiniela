@@ -29,6 +29,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin',                   [QuinielaController::class, 'adminDashboard'])->name('admin.dashboard');
     Route::post('/admin/game/{id}',        [QuinielaController::class, 'updateGameResult'])->name('admin.game.update');
     Route::post('/admin/games/bulk-update', [QuinielaController::class, 'bulkUpdateGames'])->name('admin.games.bulk_update');
+    Route::post('/admin/game/{id}/schedule', [QuinielaController::class, 'updateGameSchedule'])->name('admin.game.schedule');
     Route::get('/admin/print-results',     [QuinielaController::class, 'printResults'])->name('admin.print_results');
     Route::post('/admin/declare-champion', [QuinielaController::class, 'declareChampion'])->name('admin.champion.declare');
 

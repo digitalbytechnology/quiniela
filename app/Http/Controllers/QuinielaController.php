@@ -492,6 +492,29 @@ class QuinielaController extends Controller
         return redirect()->route('admin.dashboard')->with('success', "Información del partido actualizada exitosamente.");
     }
 
+    public function updateGameSchedule(Request $request, $id)
+    {
+        if (!Auth::user()->isAdmin()) {
+            return redirect()->route('dashboard')->with('error', 'No tienes permisos de administrador.');
+        }
+
+        $game = Game::findOrFail($id);
+
+        $request->validate([
+            'match_date' => 'required|date',
+            'match_time' => 'required|date_format:H:i',
+        ]);
+
+        $game->match_date = Carbon::parse($request->match_date . ' ' . $request->match_time);
+        $game->save();
+
+        $homeTeam = $game->homeTeam->getRealTeam();
+        $awayTeam = $game->awayTeam->getRealTeam();
+
+        return redirect()->route('admin.dashboard')
+            ->with('success', "Horario actualizado: {$homeTeam->name} vs {$awayTeam->name} — {$game->match_date->format('d/m/Y H:i')}");
+    }
+
     public function declareChampion(Request $request)
     {
         if (!Auth::user()->isAdmin()) {

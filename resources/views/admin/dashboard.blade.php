@@ -125,7 +125,17 @@
                             <!-- Game Info Section -->
                             <div class="admin-row-game" style="flex: 1.2; min-width: 280px;">
                                 <div style="min-width: 120px; font-size: 0.8rem; color: var(--text-muted);">
-                                    <div>📅 {{ $game->match_date->format('d/m/Y H:i') }}</div>
+                                    <form action="{{ route('admin.game.schedule', $game->id) }}" method="POST" style="display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;">
+                                        @csrf
+                                        <input type="date" name="match_date" value="{{ $game->match_date->format('Y-m-d') }}"
+                                            style="background: #1a1535; border: 1px solid var(--border-glass); border-radius: 6px; padding: 0.2rem 0.4rem; color: white; font-size: 0.75rem; outline: none; cursor: pointer;">
+                                        <input type="time" name="match_time" value="{{ $game->match_date->format('H:i') }}"
+                                            style="background: #1a1535; border: 1px solid var(--border-glass); border-radius: 6px; padding: 0.2rem 0.4rem; color: white; font-size: 0.75rem; outline: none; cursor: pointer;">
+                                        <button type="submit" title="Guardar horario"
+                                            style="background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.3); border-radius: 6px; padding: 0.2rem 0.5rem; color: #818cf8; font-size: 0.7rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; white-space: nowrap;"
+                                            onmouseover="this.style.background='rgba(99,102,241,0.25)'"
+                                            onmouseout="this.style.background='rgba(99,102,241,0.12)'">💾</button>
+                                    </form>
                                     <div style="text-transform: uppercase; font-weight: 700; margin-top: 0.15rem; color: var(--primary);">
                                         {{ $game->stage === 'group' ? 'Grupo ' . $homeTeam->group : $game->stage }}
                                     </div>
