@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Quiniela Mundial 2026 - Pronósticos del Mundial')</title>
     <meta name="description" content="Participa en la mejor Quiniela del Mundial de la FIFA 2026. Predice resultados, compite con amigos, acumula puntos y lidera la tabla general.">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
