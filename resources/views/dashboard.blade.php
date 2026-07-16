@@ -3,6 +3,274 @@
 @section('title', 'Mi Quiniela - Pronósticos y Tabla General')
 
 @section('content')
+
+{{-- ═══════════════════════════════════════════════
+     MODAL DE DESPEDIDA / AGRADECIMIENTO (aparece al iniciar sesión)
+     Totalmente responsivo + música: "Un Beso y una Flor" - Nino Bravo
+════════════════════════════════════════════════ --}}
+@if(session('show_farewell'))
+
+{{-- Música de fondo: YouTube iframe invisible con autoplay --}}
+<div id="farewell-music" aria-hidden="true" style="position:fixed;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;">
+    <iframe id="farewell-yt" width="1" height="1"
+        src="https://www.youtube.com/embed/F3S13S55e6c?autoplay=1&mute=0&loop=1&playlist=F3S13S55e6c&controls=0"
+        allow="autoplay; encrypted-media"
+        frameborder="0">
+    </iframe>
+</div>
+
+<div id="farewell-overlay" class="fw-overlay">
+    <div id="farewell-modal" class="fw-modal">
+
+        {{-- Partículas decorativas --}}
+        <div class="farewell-particles" aria-hidden="true"></div>
+
+        {{-- Nota musical flotante --}}
+        <div class="fw-music-note" aria-hidden="true">🎵</div>
+
+        {{-- Icono copa --}}
+        <div class="fw-trophy">🏆</div>
+
+        {{-- Título --}}
+        <h2 class="fw-subtitle">¡Bienvenido de vuelta!</h2>
+
+        {{-- Nombre del usuario --}}
+        <p class="fw-username">{{ auth()->user()->name }} 🌟</p>
+
+        {{-- Mensaje --}}
+        <div class="fw-message-box">
+            <p class="fw-message-text">
+                El Mundial 2026 está llegando a su fin y ha sido una
+                <strong class="fw-highlight">aventura increíble</strong> llena de goles, sorpresas y emociones.<br><br>
+                Gracias por ser parte de esta
+                <strong class="fw-highlight">Quiniela de Norteamérica 2026</strong>.
+                Tu participación hizo todo esto más divertido. 🎉<br><br>
+                <span class="fw-muted">¡Sigue pronosticando y llega hasta lo más alto del podio!</span>
+            </p>
+        </div>
+
+        {{-- Indicador de música --}}
+        <div class="fw-music-bar" title="Un Beso y una Flor - Nino Bravo">
+            <span class="fw-bar b1"></span>
+            <span class="fw-bar b2"></span>
+            <span class="fw-bar b3"></span>
+            <span class="fw-bar b4"></span>
+            <span class="fw-bar b5"></span>
+            <span class="fw-music-label">🎶 Un Beso y una Flor – Nino Bravo</span>
+        </div>
+
+        {{-- Botón cerrar principal --}}
+        <button onclick="closeFarewellModal()" class="fw-btn-close" id="fw-btn-main">
+            ⚽ ¡A seguir jugando!
+        </button>
+
+        {{-- X cerrar esquina --}}
+        <button onclick="closeFarewellModal()" class="fw-btn-x" aria-label="Cerrar">✕</button>
+    </div>
+</div>
+
+<style>
+/* ── Base del overlay ── */
+.fw-overlay {
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(0,0,0,0.78);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    padding: clamp(0.75rem, 4vw, 1.5rem);
+    box-sizing: border-box;
+    animation: fadeInOverlay 0.4s ease;
+}
+
+/* ── Tarjeta modal ── */
+.fw-modal {
+    background: linear-gradient(145deg, #1a1535, #0f0c1f);
+    border: 1px solid rgba(250,204,21,0.3);
+    border-radius: clamp(16px, 4vw, 28px);
+    padding: clamp(1.25rem, 5vw, 2.75rem) clamp(1rem, 5vw, 2.5rem);
+    max-width: min(480px, 100%);
+    width: 100%;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 0 60px rgba(250,204,21,0.15), 0 20px 60px rgba(0,0,0,0.6);
+    animation: slideUpModal 0.45s cubic-bezier(0.34,1.56,0.64,1);
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+/* ── Trofeo ── */
+.fw-trophy {
+    font-size: clamp(2.5rem, 10vw, 4.5rem);
+    line-height: 1;
+    margin-bottom: clamp(0.25rem, 2vw, 0.6rem);
+    filter: drop-shadow(0 0 20px rgba(250,204,21,0.6));
+    animation: trophyPulse 2s ease-in-out infinite;
+}
+
+/* ── Subtítulo ── */
+.fw-subtitle {
+    font-size: clamp(0.7rem, 2.5vw, 1.1rem);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #94a3b8;
+    margin: 0 0 clamp(0.25rem, 1.5vw, 0.5rem);
+}
+
+/* ── Nombre usuario ── */
+.fw-username {
+    font-size: clamp(1.3rem, 6vw, 2.1rem);
+    font-weight: 900;
+    margin: 0 0 clamp(0.75rem, 3vw, 1.25rem);
+    background: linear-gradient(135deg, #facc15, #f59e0b, #fbbf24);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+    word-break: break-word;
+}
+
+/* ── Caja del mensaje ── */
+.fw-message-box {
+    background: rgba(250,204,21,0.06);
+    border: 1px solid rgba(250,204,21,0.15);
+    border-radius: clamp(10px, 3vw, 16px);
+    padding: clamp(0.75rem, 3vw, 1.25rem) clamp(0.75rem, 3vw, 1.5rem);
+    margin-bottom: clamp(0.75rem, 3vw, 1.25rem);
+}
+.fw-message-text {
+    color: #e2e8f0;
+    font-size: clamp(0.8rem, 2.5vw, 1rem);
+    line-height: 1.65;
+    font-weight: 500;
+    margin: 0;
+}
+.fw-highlight { color: #facc15; }
+.fw-muted { color: #94a3b8; font-size: clamp(0.75rem, 2vw, 0.9rem); }
+
+/* ── Barra de música ── */
+.fw-music-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    margin-bottom: clamp(0.75rem, 3vw, 1.25rem);
+    flex-wrap: wrap;
+}
+.fw-bar {
+    display: inline-block;
+    width: 4px;
+    background: linear-gradient(180deg, #facc15, #f59e0b);
+    border-radius: 2px;
+    animation: soundBar 1s ease-in-out infinite;
+}
+.fw-bar.b1 { height: 10px; animation-delay: 0s; }
+.fw-bar.b2 { height: 18px; animation-delay: 0.15s; }
+.fw-bar.b3 { height: 24px; animation-delay: 0.3s; }
+.fw-bar.b4 { height: 16px; animation-delay: 0.45s; }
+.fw-bar.b5 { height: 10px; animation-delay: 0.6s; }
+.fw-music-label {
+    font-size: clamp(0.65rem, 2vw, 0.78rem);
+    color: #94a3b8;
+    margin-left: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}
+
+/* ── Botón principal ── */
+.fw-btn-close {
+    background: linear-gradient(135deg, #facc15, #f59e0b);
+    color: #0f0c1f;
+    font-weight: 800;
+    font-size: clamp(0.85rem, 3vw, 1rem);
+    border: none;
+    border-radius: clamp(8px, 2vw, 13px);
+    padding: clamp(0.65rem, 2.5vw, 0.9rem) 2rem;
+    cursor: pointer;
+    width: 100%;
+    letter-spacing: 0.02em;
+    box-shadow: 0 4px 20px rgba(250,204,21,0.35);
+    transition: transform 0.15s, box-shadow 0.15s;
+    touch-action: manipulation;
+}
+.fw-btn-close:hover,
+.fw-btn-close:focus {
+    transform: scale(1.02);
+    box-shadow: 0 6px 28px rgba(250,204,21,0.5);
+    outline: none;
+}
+.fw-btn-close:active { transform: scale(0.98); }
+
+/* ── Botón X ── */
+.fw-btn-x {
+    position: absolute; top: clamp(0.6rem, 2vw, 1rem); right: clamp(0.6rem, 2vw, 1rem);
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #94a3b8;
+    font-size: 1rem;
+    width: clamp(28px, 6vw, 34px);
+    height: clamp(28px, 6vw, 34px);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+    touch-action: manipulation;
+}
+.fw-btn-x:hover { background: rgba(255,255,255,0.14); }
+
+/* ── Nota musical flotante ── */
+.fw-music-note {
+    position: absolute; top: 0.9rem; left: 1rem;
+    font-size: clamp(1rem, 3vw, 1.4rem);
+    animation: floatNote 3s ease-in-out infinite;
+    pointer-events: none;
+}
+
+/* ── Keyframes ── */
+@keyframes fadeInOverlay {
+    from { opacity: 0; } to { opacity: 1; }
+}
+@keyframes slideUpModal {
+    from { opacity: 0; transform: translateY(40px) scale(0.92); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes trophyPulse {
+    0%, 100% { transform: scale(1) rotate(-3deg); }
+    50%       { transform: scale(1.1) rotate(3deg); }
+}
+@keyframes particleFly {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(-120px) rotate(720deg); opacity: 0; }
+}
+@keyframes soundBar {
+    0%, 100% { transform: scaleY(1); opacity: 0.8; }
+    50%       { transform: scaleY(1.8); opacity: 1; }
+}
+@keyframes floatNote {
+    0%, 100% { transform: translateY(0) rotate(-8deg); opacity: 0.6; }
+    50%       { transform: translateY(-8px) rotate(8deg); opacity: 1; }
+}
+.farewell-particles::before,
+.farewell-particles::after {
+    content: '✨';
+    position: absolute;
+    font-size: clamp(1rem, 3vw, 1.5rem);
+    animation: particleFly 2.5s ease-in-out infinite;
+    pointer-events: none;
+}
+.farewell-particles::before { left: 12%; top: 30%; animation-delay: 0s; }
+.farewell-particles::after  { right: 12%; top: 40%; animation-delay: 1.2s; }
+
+/* ── Responsive: pantallas muy pequeñas (<360px) ── */
+@media (max-width: 359px) {
+    .fw-music-label { display: none; }
+    .fw-btn-close { font-size: 0.8rem; padding: 0.6rem 1rem; }
+}
+</style>
+@endif
+
 <div class="dashboard-header" style="margin-bottom: 2.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
     <div>
         <h1 class="dashboard-title" style="font-size: 2.25rem; font-weight: 800; background: linear-gradient(135deg, white, #cbd5e1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
@@ -792,5 +1060,24 @@
             if (chevron) chevron.style.transform = 'rotate(0deg)';
         }
     }
+
+    // ── Cerrar modal de despedida con animación ──
+    function closeFarewellModal() {
+        const overlay = document.getElementById('farewell-overlay');
+        if (!overlay) return;
+        overlay.style.transition = 'opacity 0.35s ease';
+        overlay.style.opacity = '0';
+        setTimeout(() => overlay.remove(), 370);
+    }
+
+    // Cerrar modal al hacer clic en el overlay (fuera del modal)
+    document.addEventListener('DOMContentLoaded', () => {
+        const overlay = document.getElementById('farewell-overlay');
+        if (overlay) {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) closeFarewellModal();
+            });
+        }
+    });
 </script>
 @endsection
