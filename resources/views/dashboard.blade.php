@@ -11,10 +11,8 @@
 @if(session('show_farewell'))
 @php session()->forget('show_farewell'); @endphp
 
-{{-- Música de fondo: YouTube Player API (Totalmente opaco para el navegador, pero oculto detrás del contenido con z-index) --}}
-<div id="farewell-music" aria-hidden="true" style="position:fixed; top:0; left:0; width:300px; height:300px; z-index:-100; pointer-events:none; opacity: 1;">
-    <div id="farewell-yt"></div>
-</div>
+{{-- Música de fondo: Audio HTML5 nativo (100% infalible, sin iframes ni problemas CORS) --}}
+<audio id="farewell-audio" src="{{ asset('audio/sorpresa.webm') }}" preload="auto" loop></audio>
 
 <div id="farewell-overlay" class="fw-overlay">
     
@@ -25,8 +23,8 @@
         <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 2rem; text-align: center; max-width: 80%;">
             Para vivir la experiencia completa, necesitamos tu permiso para reproducir audio.
         </p>
-        <button id="fw-btn-intro" onclick="openFarewellMsg()" class="fw-btn-close" style="max-width: 300px; opacity: 0.6; cursor: not-allowed;" disabled>
-            ⏳ Cargando sorpresa...
+        <button id="fw-btn-intro" onclick="openFarewellMsg()" class="fw-btn-close" style="max-width: 300px;">
+            🔊 Permitir Audio y Abrir
         </button>
     </div>
 
@@ -1072,58 +1070,11 @@
         }
     }
 
-    // ── API de YouTube ──
-    let ytPlayer;
-    window.onYouTubeIframeAPIReady = function() {
-        ytPlayer = new YT.Player('farewell-yt', {
-            height: '300',
-            width: '300',
-            videoId: '9ryEZcHkUBk',
-            playerVars: {
-                'playsinline': 1,
-                'controls': 0,
-                'disablekb': 1,
-                'loop': 1,
-                'playlist': '9ryEZcHkUBk'
-            },
-            events: {
-                'onReady': function(event) {
-                    // El reproductor está listo. Habilitamos el botón.
-                    const btn = document.getElementById('fw-btn-intro');
-                    if (btn) {
-                        btn.disabled = false;
-                        btn.style.opacity = '1';
-                        btn.style.cursor = 'pointer';
-                        btn.innerHTML = '🔊 Permitir Audio y Abrir';
-                    }
-                },
-                'onError': function(event) {
-                    // Si el video de YT falla por alguna restricción, habilitar el botón de todos modos para que puedan ver el modal
-                    const btn = document.getElementById('fw-btn-intro');
-                    if (btn) {
-                        btn.disabled = false;
-                        btn.style.opacity = '1';
-                        btn.style.cursor = 'pointer';
-                        btn.innerHTML = 'Abrir Mensaje (Audio no disponible)';
-                    }
-                }
-            }
-        });
-    };
-
     // ── Abrir modal real y reproducir música ──
     function openFarewellMsg() {
-        if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
-            try {
-                ytPlayer.unMute();
-                ytPlayer.playVideo();
-            } catch(e) {}
-        } else {
-            // Fallback agresivo si el YT Player falló o el usuario hizo clic muy rápido
-            const container = document.getElementById('farewell-music');
-            if (container) {
-                container.innerHTML = `<iframe width="300" height="300" src="https://www.youtube.com/embed/9ryEZcHkUBk?autoplay=1&mute=0&loop=1&playlist=9ryEZcHkUBk&controls=0" frameborder="0" allow="autoplay; encrypted-media"></iframe>`;
-            }
+        const audio = document.getElementById('farewell-audio');
+        if (audio) {
+            audio.play().catch(e => console.warn("Audio bloqueado:", e));
         }
         document.getElementById('fw-intro').style.display = 'none';
         document.getElementById('farewell-modal').style.display = 'block';
@@ -1131,11 +1082,10 @@
 
     // ── Cerrar modal de despedida con animación ──
     function closeFarewellModal() {
-        if (ytPlayer && typeof ytPlayer.stopVideo === 'function') {
-            ytPlayer.stopVideo();
-        } else {
-            const container = document.getElementById('farewell-yt');
-            if (container) container.innerHTML = ''; // Detener fallback
+        const audio = document.getElementById('farewell-audio');
+        if (audio) {
+            audio.pause();
+            audio.currentTime = 0;
         }
 
         const overlay = document.getElementById('farewell-overlay');
@@ -1149,28 +1099,10 @@
     document.addEventListener('DOMContentLoaded', () => {
         const overlay = document.getElementById('farewell-overlay');
         if (overlay) {
-            // Inyectar script de YT API dinámicamente
-            const tag = document.createElement('script');
-            tag.src = "https://www.youtube.com/iframe_api";
-            const firstScriptTag = document.getElementsByTagName('script')[0];
-            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
             // Cerrar al hacer clic en el overlay (fuera del modal)
             overlay.addEventListener('click', function(e) {
                 if (e.target === overlay) closeFarewellModal();
             });
-
-            // Respaldo de seguridad: Habilitar botón de todos modos después de 2 segundos 
-            // por si la API de YouTube falla silenciosamente por CORS u orígenes
-            setTimeout(() => {
-                const btn = document.getElementById('fw-btn-intro');
-                if (btn && btn.disabled) {
-                    btn.disabled = false;
-                    btn.style.opacity = '1';
-                    btn.style.cursor = 'pointer';
-                    btn.innerHTML = '🔊 Permitir Audio y Abrir';
-                }
-            }, 2000);
         }
     });
 </script>
