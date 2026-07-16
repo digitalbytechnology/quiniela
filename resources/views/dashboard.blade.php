@@ -25,9 +25,12 @@
     {{-- Pantalla inicial para requerir interacción (desbloquea autoplay de audio en navegadores) --}}
     <div id="fw-intro" class="fw-modal" style="display:flex; flex-direction:column; justify-content:center; align-items:center; min-height: 300px;">
         <div style="font-size: 4.5rem; margin-bottom: 1rem; animation: trophyPulse 2s ease-in-out infinite;">💌</div>
-        <h2 class="fw-subtitle" style="font-size: clamp(1rem, 4vw, 1.3rem); color: #fff; margin-bottom: 2rem;">Tienes un mensaje especial</h2>
-        <button onclick="openFarewellMsg()" class="fw-btn-close" style="max-width: 250px;">
-            Abrir Mensaje
+        <h2 class="fw-subtitle" style="font-size: clamp(1rem, 4vw, 1.3rem); color: #fff; margin-bottom: 0.5rem;">Tienes un mensaje especial</h2>
+        <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 2rem; text-align: center; max-width: 80%;">
+            Para vivir la experiencia completa, necesitamos tu permiso para reproducir audio.
+        </p>
+        <button onclick="openFarewellMsg()" class="fw-btn-close" style="max-width: 300px;">
+            🔊 Permitir Audio y Abrir
         </button>
     </div>
 
@@ -62,13 +65,13 @@
         </div>
 
         {{-- Indicador de música --}}
-        <div class="fw-music-bar" title="Un Beso y una Flor - Nino Bravo">
+        <div class="fw-music-bar" title="Sorpresa Musical">
             <span class="fw-bar b1"></span>
             <span class="fw-bar b2"></span>
             <span class="fw-bar b3"></span>
             <span class="fw-bar b4"></span>
             <span class="fw-bar b5"></span>
-            <span class="fw-music-label">🎶 Un Beso y una Flor – Nino Bravo</span>
+            <span class="fw-music-label">🎶 Sorpresa Musical</span>
         </div>
 
         {{-- Botón cerrar principal --}}
@@ -1078,7 +1081,7 @@
         const yt = document.getElementById('farewell-yt');
         if (yt) {
             // Inyectamos el src ahora que hay interacción del usuario (permite unmuted autoplay)
-            yt.src = "https://www.youtube.com/embed/F3S13S55e6c?autoplay=1&mute=0&loop=1&playlist=F3S13S55e6c&controls=0";
+            yt.src = "https://www.youtube.com/embed/9ryEZcHkUBk?autoplay=1&mute=0&loop=1&playlist=9ryEZcHkUBk&controls=0";
         }
         document.getElementById('fw-intro').style.display = 'none';
         document.getElementById('farewell-modal').style.display = 'block';
