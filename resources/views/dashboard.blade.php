@@ -11,17 +11,28 @@
 @if(session('show_farewell'))
 @php session()->forget('show_farewell'); @endphp
 
-{{-- Música de fondo: YouTube iframe invisible con autoplay --}}
+{{-- Música de fondo: YouTube iframe invisible (src se inyecta por JS tras clic) --}}
 <div id="farewell-music" aria-hidden="true" style="position:fixed;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;">
     <iframe id="farewell-yt" width="1" height="1"
-        src="https://www.youtube.com/embed/F3S13S55e6c?autoplay=1&mute=0&loop=1&playlist=F3S13S55e6c&controls=0"
+        src=""
         allow="autoplay; encrypted-media"
         frameborder="0">
     </iframe>
 </div>
 
 <div id="farewell-overlay" class="fw-overlay">
-    <div id="farewell-modal" class="fw-modal">
+    
+    {{-- Pantalla inicial para requerir interacción (desbloquea autoplay de audio en navegadores) --}}
+    <div id="fw-intro" class="fw-modal" style="display:flex; flex-direction:column; justify-content:center; align-items:center; min-height: 300px;">
+        <div style="font-size: 4.5rem; margin-bottom: 1rem; animation: trophyPulse 2s ease-in-out infinite;">💌</div>
+        <h2 class="fw-subtitle" style="font-size: clamp(1rem, 4vw, 1.3rem); color: #fff; margin-bottom: 2rem;">Tienes un mensaje especial</h2>
+        <button onclick="openFarewellMsg()" class="fw-btn-close" style="max-width: 250px;">
+            Abrir Mensaje
+        </button>
+    </div>
+
+    {{-- Modal Principal (Oculto inicialmente) --}}
+    <div id="farewell-modal" class="fw-modal" style="display: none;">
 
         {{-- Partículas decorativas --}}
         <div class="farewell-particles" aria-hidden="true"></div>
@@ -1062,8 +1073,22 @@
         }
     }
 
+    // ── Abrir modal real y reproducir música ──
+    function openFarewellMsg() {
+        const yt = document.getElementById('farewell-yt');
+        if (yt) {
+            // Inyectamos el src ahora que hay interacción del usuario (permite unmuted autoplay)
+            yt.src = "https://www.youtube.com/embed/F3S13S55e6c?autoplay=1&mute=0&loop=1&playlist=F3S13S55e6c&controls=0";
+        }
+        document.getElementById('fw-intro').style.display = 'none';
+        document.getElementById('farewell-modal').style.display = 'block';
+    }
+
     // ── Cerrar modal de despedida con animación ──
     function closeFarewellModal() {
+        const yt = document.getElementById('farewell-yt');
+        if (yt) yt.src = ""; // Detener música al cerrar
+
         const overlay = document.getElementById('farewell-overlay');
         if (!overlay) return;
         overlay.style.transition = 'opacity 0.35s ease';
