@@ -11,13 +11,9 @@
 @if(session('show_farewell'))
 @php session()->forget('show_farewell'); @endphp
 
-{{-- Música de fondo: YouTube iframe invisible (src se inyecta por JS tras clic) --}}
-<div id="farewell-music" aria-hidden="true" style="position:fixed;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;">
-    <iframe id="farewell-yt" width="1" height="1"
-        src=""
-        allow="autoplay; encrypted-media"
-        frameborder="0">
-    </iframe>
+{{-- Música de fondo: YouTube Player API (fuera de pantalla para evitar políticas de muting agresivo) --}}
+<div id="farewell-music" aria-hidden="true" style="position:fixed; top:-9999px; left:-9999px; width:200px; height:200px; z-index:-1; pointer-events:none; opacity: 0.01;">
+    <div id="farewell-yt"></div>
 </div>
 
 <div id="farewell-overlay" class="fw-overlay">
@@ -1076,12 +1072,34 @@
         }
     }
 
+    // ── API de YouTube ──
+    let ytPlayer;
+    window.onYouTubeIframeAPIReady = function() {
+        ytPlayer = new YT.Player('farewell-yt', {
+            height: '200',
+            width: '200',
+            videoId: '9ryEZcHkUBk',
+            playerVars: {
+                'playsinline': 1,
+                'controls': 0,
+                'disablekb': 1,
+                'loop': 1,
+                'playlist': '9ryEZcHkUBk'
+            }
+        });
+    };
+
     // ── Abrir modal real y reproducir música ──
     function openFarewellMsg() {
-        const yt = document.getElementById('farewell-yt');
-        if (yt) {
-            // Inyectamos el src ahora que hay interacción del usuario (permite unmuted autoplay)
-            yt.src = "https://www.youtube.com/embed/9ryEZcHkUBk?autoplay=1&mute=0&loop=1&playlist=9ryEZcHkUBk&controls=0";
+        if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
+            ytPlayer.unMute();
+            ytPlayer.playVideo();
+        } else {
+            // Fallback si la API no cargó
+            const container = document.getElementById('farewell-yt');
+            if (container) {
+                container.innerHTML = `<iframe width="200" height="200" src="https://www.youtube.com/embed/9ryEZcHkUBk?autoplay=1&mute=0&loop=1&playlist=9ryEZcHkUBk&controls=0" frameborder="0" allow="autoplay; encrypted-media"></iframe>`;
+            }
         }
         document.getElementById('fw-intro').style.display = 'none';
         document.getElementById('farewell-modal').style.display = 'block';
@@ -1089,8 +1107,12 @@
 
     // ── Cerrar modal de despedida con animación ──
     function closeFarewellModal() {
-        const yt = document.getElementById('farewell-yt');
-        if (yt) yt.src = ""; // Detener música al cerrar
+        if (ytPlayer && typeof ytPlayer.stopVideo === 'function') {
+            ytPlayer.stopVideo();
+        } else {
+            const container = document.getElementById('farewell-yt');
+            if (container) container.innerHTML = ''; // Detener fallback
+        }
 
         const overlay = document.getElementById('farewell-overlay');
         if (!overlay) return;
@@ -1099,10 +1121,17 @@
         setTimeout(() => overlay.remove(), 370);
     }
 
-    // Cerrar modal al hacer clic en el overlay (fuera del modal)
+    // Inicializaciones al cargar el DOM
     document.addEventListener('DOMContentLoaded', () => {
         const overlay = document.getElementById('farewell-overlay');
         if (overlay) {
+            // Inyectar script de YT API dinámicamente
+            const tag = document.createElement('script');
+            tag.src = "https://www.youtube.com/iframe_api";
+            const firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+            // Cerrar al hacer clic en el overlay (fuera del modal)
             overlay.addEventListener('click', function(e) {
                 if (e.target === overlay) closeFarewellModal();
             });
