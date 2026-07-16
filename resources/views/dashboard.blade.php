@@ -1084,8 +1084,7 @@
                 'controls': 0,
                 'disablekb': 1,
                 'loop': 1,
-                'playlist': '9ryEZcHkUBk',
-                'origin': window.location.origin
+                'playlist': '9ryEZcHkUBk'
             },
             events: {
                 'onReady': function(event) {
@@ -1115,8 +1114,16 @@
     // ── Abrir modal real y reproducir música ──
     function openFarewellMsg() {
         if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
-            ytPlayer.unMute();
-            ytPlayer.playVideo();
+            try {
+                ytPlayer.unMute();
+                ytPlayer.playVideo();
+            } catch(e) {}
+        } else {
+            // Fallback agresivo si el YT Player falló o el usuario hizo clic muy rápido
+            const container = document.getElementById('farewell-music');
+            if (container) {
+                container.innerHTML = `<iframe width="300" height="300" src="https://www.youtube.com/embed/9ryEZcHkUBk?autoplay=1&mute=0&loop=1&playlist=9ryEZcHkUBk&controls=0" frameborder="0" allow="autoplay; encrypted-media"></iframe>`;
+            }
         }
         document.getElementById('fw-intro').style.display = 'none';
         document.getElementById('farewell-modal').style.display = 'block';
@@ -1152,6 +1159,18 @@
             overlay.addEventListener('click', function(e) {
                 if (e.target === overlay) closeFarewellModal();
             });
+
+            // Respaldo de seguridad: Habilitar botón de todos modos después de 2 segundos 
+            // por si la API de YouTube falla silenciosamente por CORS u orígenes
+            setTimeout(() => {
+                const btn = document.getElementById('fw-btn-intro');
+                if (btn && btn.disabled) {
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    btn.style.cursor = 'pointer';
+                    btn.innerHTML = '🔊 Permitir Audio y Abrir';
+                }
+            }, 2000);
         }
     });
 </script>
