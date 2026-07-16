@@ -44,6 +44,7 @@ class QuinielaController extends Controller
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
+            $request->session()->put('show_farewell', true);
             return redirect()->intended(route('dashboard'));
         }
 

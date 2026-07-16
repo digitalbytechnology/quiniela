@@ -9,6 +9,7 @@
      Totalmente responsivo + música: "Un Beso y una Flor" - Nino Bravo
 ════════════════════════════════════════════════ --}}
 @if(session('show_farewell'))
+@php session()->forget('show_farewell'); @endphp
 
 {{-- Música de fondo: YouTube iframe invisible con autoplay --}}
 <div id="farewell-music" aria-hidden="true" style="position:fixed;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;">
