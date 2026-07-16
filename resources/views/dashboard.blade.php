@@ -625,9 +625,14 @@
                             @php
                                 $isMe = $lUser->id === auth()->id();
                                 $position = $index + 1;
+                                $userPick = $lUser->championPick;
+                                // Determinar si el campeón elegido fue eliminado:
+                                // Si hay campeón oficial Y el pick del usuario NO es el campeón → eliminado
+                                $isEliminated = $worldChampion && $userPick && ($userPick->id !== $worldChampion->id);
+                                $rowOpacity = $isEliminated ? 'opacity: 0.45; filter: grayscale(100%);' : '';
                             @endphp
-                            <tr class="leaderboard-row {{ $isMe ? 'current-user' : '' }}">
-                                <td class="rank-col" style="padding: 0.85rem 1rem; font-size: 0.95rem;">
+                            <tr class="leaderboard-row {{ $isMe ? 'current-user' : '' }}" style="{{ $isEliminated ? 'opacity: 0.45; filter: grayscale(100%);' : '' }}">
+                                <td class="rank-col" style="padding: 0.85rem 1rem; font-size: 0.95rem; {{ $isEliminated ? 'color: var(--text-muted);' : '' }}">
                                     @if($position == 1) 🥇
                                     @elseif($position == 2) 🥈
                                     @elseif($position == 3) 🥉
@@ -636,20 +641,39 @@
                                 </td>
                                 <td style="padding: 0.85rem 1rem; font-size: 0.9rem; display: flex; align-items: center; gap: 0.75rem; border-bottom: none;">
                                     @if($lUser->profile_picture)
-                                        <img src="{{ asset($lUser->profile_picture) }}" alt="Avatar {{ $lUser->name }}" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-glass);">
+                                        <img src="{{ asset($lUser->profile_picture) }}" alt="Avatar {{ $lUser->name }}" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-glass); {{ $isEliminated ? 'filter: grayscale(100%);' : '' }}">
                                     @else
                                         <div style="width: 42px; height: 42px; border-radius: 50%; background: rgba(255, 255, 255, 0.05); display: inline-flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: 700; color: var(--text-muted); border: 2px solid var(--border-glass);">
                                             {{ strtoupper(substr($lUser->name, 0, 2)) }}
                                         </div>
                                     @endif
-                                    <div style="display: flex; align-items: center; gap: 0.25rem;">
-                                        <span style="font-weight: 600; {{ $isMe ? 'color: var(--primary);' : '' }}">{{ $lUser->name }}</span>
-                                        @if($isMe)
-                                            <span style="font-size: 0.65rem; background: rgba(99, 102, 241, 0.2); padding: 0.1rem 0.35rem; border-radius: 8px;">Tú</span>
+                                    <div style="display: flex; flex-direction: column; gap: 0.15rem;">
+                                        <div style="display: flex; align-items: center; gap: 0.3rem;">
+                                            <span style="font-weight: 600; {{ $isMe ? 'color: var(--primary);' : '' }} {{ $isEliminated ? 'color: var(--text-muted) !important;' : '' }}">{{ $lUser->name }}</span>
+                                            @if($isMe)
+                                                <span style="font-size: 0.65rem; background: rgba(99, 102, 241, 0.2); padding: 0.1rem 0.35rem; border-radius: 8px;">Tú</span>
+                                            @endif
+                                        </div>
+                                        @if($userPick && $userPick->code)
+                                            <div style="display: flex; align-items: center; gap: 0.3rem;"
+                                                 title="Campeón elegido: {{ $userPick->name }}{{ $isEliminated ? ' — ELIMINADO ❌' : '' }}">
+                                                <img src="https://flagcdn.com/w40/{{ $userPick->code }}.png"
+                                                     alt="Bandera {{ $userPick->name }}"
+                                                     style="height: 13px; border-radius: 2px; {{ $isEliminated ? 'filter: grayscale(100%); opacity: 0.6;' : '' }}"
+                                                     onerror="this.style.display='none'">
+                                                <span style="font-size: 0.68rem; color: var(--text-muted); font-weight: 500; white-space: nowrap;">
+                                                    🏆 {{ $userPick->name }}
+                                                    @if($isEliminated)
+                                                        <span style="color: #ef4444; font-weight: 700;">❌</span>
+                                                    @elseif($worldChampion && $userPick->id === $worldChampion->id)
+                                                        <span style="color: #facc15; font-weight: 700;">✅</span>
+                                                    @endif
+                                                </span>
+                                            </div>
                                         @endif
                                     </div>
                                 </td>
-                                <td style="text-align: right; font-weight: 800; font-size: 1rem; color: {{ $isMe ? 'var(--secondary)' : 'white' }}; padding: 0.85rem 1rem;">
+                                <td style="text-align: right; font-weight: 800; font-size: 1rem; color: {{ $isMe ? 'var(--secondary)' : 'white' }}; padding: 0.85rem 1rem; {{ $isEliminated ? 'color: var(--text-muted) !important;' : '' }}">
                                     {{ $lUser->points }} pts
                                 </td>
                             </tr>

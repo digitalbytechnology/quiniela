@@ -120,7 +120,7 @@ class QuinielaController extends Controller
         $predictions = Prediction::where('user_id', $user->id)->get()->keyBy('game_id');
 
         // Leaderboard (ordered by points, then name)
-        $leaderboard = User::where('role', '!=', 'admin')->orderBy('points', 'desc')->orderBy('name', 'asc')->get();
+        $leaderboard = User::where('role', '!=', 'admin')->with('championPick')->orderBy('points', 'desc')->orderBy('name', 'asc')->get();
 
         // Champion pick data
         $realTeams       = Team::whereNotIn('group', ['TBD'])->whereNotNull('group')->orderBy('group')->orderBy('name')->get();
