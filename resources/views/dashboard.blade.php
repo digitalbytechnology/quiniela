@@ -11,8 +11,8 @@
 @if(session('show_farewell'))
 @php session()->forget('show_farewell'); @endphp
 
-{{-- Música de fondo: YouTube Player API (fuera de pantalla para evitar políticas de muting agresivo) --}}
-<div id="farewell-music" aria-hidden="true" style="position:fixed; top:-9999px; left:-9999px; width:200px; height:200px; z-index:-1; pointer-events:none; opacity: 0.01;">
+{{-- Música de fondo: YouTube Player API (Totalmente opaco para el navegador, pero oculto detrás del contenido con z-index) --}}
+<div id="farewell-music" aria-hidden="true" style="position:fixed; top:0; left:0; width:300px; height:300px; z-index:-100; pointer-events:none; opacity: 1;">
     <div id="farewell-yt"></div>
 </div>
 
@@ -25,8 +25,8 @@
         <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 2rem; text-align: center; max-width: 80%;">
             Para vivir la experiencia completa, necesitamos tu permiso para reproducir audio.
         </p>
-        <button onclick="openFarewellMsg()" class="fw-btn-close" style="max-width: 300px;">
-            🔊 Permitir Audio y Abrir
+        <button id="fw-btn-intro" onclick="openFarewellMsg()" class="fw-btn-close" style="max-width: 300px; opacity: 0.6; cursor: not-allowed;" disabled>
+            ⏳ Cargando sorpresa...
         </button>
     </div>
 
@@ -1076,15 +1076,38 @@
     let ytPlayer;
     window.onYouTubeIframeAPIReady = function() {
         ytPlayer = new YT.Player('farewell-yt', {
-            height: '200',
-            width: '200',
+            height: '300',
+            width: '300',
             videoId: '9ryEZcHkUBk',
             playerVars: {
                 'playsinline': 1,
                 'controls': 0,
                 'disablekb': 1,
                 'loop': 1,
-                'playlist': '9ryEZcHkUBk'
+                'playlist': '9ryEZcHkUBk',
+                'origin': window.location.origin
+            },
+            events: {
+                'onReady': function(event) {
+                    // El reproductor está listo. Habilitamos el botón.
+                    const btn = document.getElementById('fw-btn-intro');
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.style.opacity = '1';
+                        btn.style.cursor = 'pointer';
+                        btn.innerHTML = '🔊 Permitir Audio y Abrir';
+                    }
+                },
+                'onError': function(event) {
+                    // Si el video de YT falla por alguna restricción, habilitar el botón de todos modos para que puedan ver el modal
+                    const btn = document.getElementById('fw-btn-intro');
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.style.opacity = '1';
+                        btn.style.cursor = 'pointer';
+                        btn.innerHTML = 'Abrir Mensaje (Audio no disponible)';
+                    }
+                }
             }
         });
     };
@@ -1094,12 +1117,6 @@
         if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
             ytPlayer.unMute();
             ytPlayer.playVideo();
-        } else {
-            // Fallback si la API no cargó
-            const container = document.getElementById('farewell-yt');
-            if (container) {
-                container.innerHTML = `<iframe width="200" height="200" src="https://www.youtube.com/embed/9ryEZcHkUBk?autoplay=1&mute=0&loop=1&playlist=9ryEZcHkUBk&controls=0" frameborder="0" allow="autoplay; encrypted-media"></iframe>`;
-            }
         }
         document.getElementById('fw-intro').style.display = 'none';
         document.getElementById('farewell-modal').style.display = 'block';
